@@ -1,0 +1,186 @@
+library(ggplot2)
+library(dplyr)
+
+1.1 - What is Simple Linear Regression?
+  SLR us statistical method that allows us to summarize and study 
+relationships between two continuous (quantitative) variables
+One variable is denoted as x , referred as independent variable or
+predictor or featyre.
+Another variable is referred as y or dependent variable or 
+response or outcome.
+By relations is implied that changes in x cause changes in 
+y.
+we also talk about statistical ralationshisps which imply that
+changes in x due to changes in y may contain diviation depending 
+on sample of data in x.
+list.files("Reg_Datasets")
+d1<-mtcars[,c(1,2,3,4)]
+
+ggplot(data=d1,aes(hp,mpg)) + geom_point(col="red") + 
+  geom_smooth(method="lm")
+Therefore, as mpg increases, we expect hp to increase, as more powerfull
+cars requre more gasoline to run.
+As our relation as statistical, plot demonstates
+scatter, indicaring that line does not 
+go through all points.
+
+
+#1.2 - What is the "Best Fitting Line"?
+We are intrested in average response of y given value of x.
+Best fitted line has a form of
+cat( "y=b0+b1x" )
+lets create model
+m1<-lm(hp~mpg,data=d1)
+summary(m1)
+coefficients(m1)
+
+lets have a look what ig we plot values on x into formula 
+and compare actual data versus fitted
+
+d1<-mtcars[,c(1,2,3,4)]
+d1<-d1 %>%  mutate(fit=coefficients(m1)[1]+coefficients(m1)[2]*mpg  )
+ggplot(data=d1,aes(y=hp,x=mpg)) + geom_point(col="red") + 
+  geom_line(aes(y=fit),col="blue",cex=1 )
+
+All values producesby equation form straight line
+If we want to know value of hp given x which isnot in our dataset,
+we can still use equation to predict value of y
+
+There would be error between forecated values and actual,
+let denote it as er
+
+d1<-d1 %>%  mutate(er=hp-fit  )
+We want to find coefficients of betta whcih would mimnimise sum of errors
+In this case, we wil call for leas square criterion 
+which minimise the sum of the squared fitted errors.
+
+The equation of line is 
+cat( "y=b0+b1x" )
+we need to find b0 and b1 that make the sum of squared errors
+lowest as possible.
+Therefore, we need tofind coefficients that
+minimise 
+cat( "sum( (y-y_hat)^2 )"  )
+If we dont use square prediction error would cancel each other.
+Therefore, we need to use calculus to find max of function
+cat( "sum( (y- (b0+b1x)  )^2 )"  )
+We need to differentioate it with respect to b1 and find it.
+
+If we do it , leat squares estimates are:
+  cat( "b0=mean(y)-b1(mean(x))" )
+ 
+  cat( "  sum[ (x-mean)(y-mean(y)) ] / sum( (x-mean(x)^2 )   " )
+  or 
+  cat(  "Cov(x,y)/var(x)"  )
+  
+Line which results from the respective coefficients is 
+known as least squares line or least squares regression line
+
+The respective approach is appropriate for data which follows
+a linear trend.
+Sign of betts is determined by numerator, which is the
+prduct of 2 distances.
+
+we can print summary of regresision via
+summary(m1) 
+which allows to implement standard regression analysis
+sum(d1$er^2)
+
+
+
+with regresisoin line we can predict values which are not
+in our dataset, ut we need to base our forecast
+on x which is inside scope of model and our 
+dataset cover range of data used for prediction. 
+
+b1  tells us that if we increase x by 1, 
+y would increase by b1.
+In general, we can expect the mean response to increase or
+decrease by b1 units for every one unit increase in x.
+
+
+#1.3 - The Simple Linear Regression Model
+
+d2<-ToothGrowth
+
+ggplot(data=d2,aes(x=dose,y=len) )+ geom_point(col="red")
+  names(d2)
+  
+Lets estimate mean  of each group
+d2 %>% group_by(dose) %>% summarise(mean1=(mean(len)))
+
+how lets estimate regression
+m2<-lm(len~dose,data=d2)
+and have a look on moel response if we provide dosage as input
+
+predict(m2,newdata = data.frame( dose=c(0.5,1,2) ))
+Values are differetn as we are converned about decreasing 
+sum of errors across all samples.
+
+In estimating regression, we have to rely on sample to estimate
+population regression line.Therefore, we assume 
+existance of true coefficients but able to estimate
+only sample coeffictients
+
+
+lest sample our data nad resstimte coefficients
+d2.2<-slice_sample(d2,prop=0.7)
+m2.2<-lm(len~dose,data=d2.2)
+coefficients(m2)
+coefficients(m2.2)
+
+Values are close but not identical , lets decrease sample
+d2.2<-slice_sample(d2,prop=0.5)
+m2.2<-lm(len~dose,data=d2.2)
+coefficients(m2)
+coefficients(m2.2)
+Now difference is more apparent.
+
+lets collect 100 balues of b1
+col_b1<-as.vector(rep(0,100),mode="numeric")
+
+f1<-function(x){
+ x1<-slice_sample(x,prop=0.5)
+ mf.2<-lm(len~dose,data=x1)
+ out1<-coefficients(mf.2)[2]
+ return(out1)
+}
+
+f1(d2)
+
+col_b1<-replicate( 10000,f1(d2) ) %>% unname()
+hist(col_b1,breaks = 40)
+
+We can see that distibution of betts is normal and approaches 
+true mean of betta
+coefficients(m2)[2]
+mean(col_b1)
+
+The follwoong assumption comprise
+engine of simple linear  regression 
+Mean ressponse of y is linear fucntion of x
+Linear relationship
+
+Errors are independent
+No auto-correlation
+
+Errors are normally distibuted
+
+Errirs at each predictor have equal variance.
+Homoscedasticity
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
