@@ -68,11 +68,11 @@ We need to differentioate it with respect to b1 and find it.
 
 If we do it , leat squares estimates are:
   cat( "b0=mean(y)-b1(mean(x))" )
- 
-  cat( "  sum[ (x-mean)(y-mean(y)) ] / sum( (x-mean(x)^2 )   " )
-  or 
-  cat(  "Cov(x,y)/var(x)"  )
-  
+
+cat( "  sum[ (x-mean)(y-mean(y)) ] / sum( (x-mean(x)^2 )   " )
+or 
+cat(  "Cov(x,y)/var(x)"  )
+
 Line which results from the respective coefficients is 
 known as least squares line or least squares regression line
 
@@ -104,8 +104,8 @@ decrease by b1 units for every one unit increase in x.
 d2<-ToothGrowth
 
 ggplot(data=d2,aes(x=dose,y=len) )+ geom_point(col="red")
-  names(d2)
-  
+names(d2)
+
 Lets estimate mean  of each group
 d2 %>% group_by(dose) %>% summarise(mean1=(mean(len)))
 
@@ -121,7 +121,6 @@ In estimating regression, we have to rely on sample to estimate
 population regression line.Therefore, we assume 
 existance of true coefficients but able to estimate
 only sample coeffictients
-
 
 lest sample our data nad resstimte coefficients
 d2.2<-slice_sample(d2,prop=0.7)
@@ -140,10 +139,10 @@ lets collect 100 balues of b1
 col_b1<-as.vector(rep(0,100),mode="numeric")
 
 f1<-function(x){
- x1<-slice_sample(x,prop=0.5)
- mf.2<-lm(len~dose,data=x1)
- out1<-coefficients(mf.2)[2]
- return(out1)
+  x1<-slice_sample(x,prop=0.5)
+  mf.2<-lm(len~dose,data=x1)
+  out1<-coefficients(mf.2)[2]
+  return(out1)
 }
 
 f1(d2)
@@ -169,8 +168,295 @@ Errors are normally distibuted
 Errirs at each predictor have equal variance.
 Homoscedasticity
 
+ggplot(data=d2,aes(x=dose,y=len) )+ geom_point(col="red")
+names(d2)
+
+Norice we cant draw straing line which connect mean
+poins of data if there are more that 2 groups of observations.
 
 
+#1.4 - What is The Common Error Variance?
+
+d2<-ToothGrowth
+
+ggplot(data=d2,aes(x=dose,y=len) )+ geom_point(col="red")
+names(d2)
+
+
+lets check variance of each group
+d2 %>% group_by(dose) %>%
+       summarise(var(len))
+var(d2$len)
+
+Only varoance of group 2 is
+different.
+Variance of data , for whole population 
+quantifies how much response of y vary arounf
+the unknown mean, notice that 
+variance og grouped data is lower
+that overall variance.
+
+Greater is variance of data, moe challenging is
+forecasting  task.
+Clustering as part of machine learning
+includes variance minimisation to 
+separate data in homogenous clusters.
+
+
+To get an idea, therefore, of how 
+precise future predictions would be, we need to know how much the responses (y) vary around the (unknown) 
+mean population regression line
+
+As always we dont know true variance 
+of population, the best we can is to 
+estimate sample variance.
+
+
+cat("sample variance= sum( (y-mean(y))^2 )/(n-1) ")
+
+As we use mean of population we use n-1
+as it costs is 1 degree of freedom 
+m2<-lm(len~dose,data=d2)
+summary(m2)
+var(d2$len)
+sd(d2$len)
+
+Lets apply same formula for errors
+var( residuals(m2) )
+sd( residuals(m2) )
+This is residuals standard error
+Manually
+p1<-sum(residuals(m2)^2)
+sqrt( p1/nrow(d2) )
+sqrt( p1/(nrow(d2)-2) )
+Therefore we need to divide it by n-2
+
+This is residual standard error or regression 
+standard error
+
+#1.5 - The Coefficient of Determination, 
+
+First we need to estimate 3 statistics
+RSS<-sum( (fitted(m2)-mean(d2$len))^2  )
+This are sum of distances of fitted values 
+away from mean
+
+ESS<-sum( (d2$len-fitted(m2))^2 )
+This are sum of distances from actial data from 
+fitted values
+
+TSS<-sum( (d2$len-mean(d2$len))^2 )
+This quantifies sum of distances of data 
+around mean
+summary(m2)
+RSS/TSS
+
+cat("TSS=RSS+ESS")
+Therefore , formula explains 
+variatiomn of data in terms of random variations and
+variations explained by fitted model
+
+cat("Multiple R-squared:RSS/TSS")
+If the value if high it means regression 
+explans large part of varioation in data.
+
+definition is that r shos variation in y 
+explained by variations in x, large value
+is better.
+Or
+The % of vatriations reduced by taking into account 
+predictor x
+
+
+1.6 - (Pearson) Correlation Coefficient, 
+m2<-lm(len~dose,data=d2)
+summary(m2)
+Correlation between data
+can show information if there 
+is comovement between variables
+with(d2,cor(len,dose))
+with(d2,cov(len,dose))
+sqrt( with(d2,cor(len,dose)) )
+coefficients(m2)
+
+summary(m2)$r.squared
+with(d2,cor(len,dose))
+
+sqrt(summary(m2)$r.squared)
+with(d2,cor(len,dose))
+Therefore, for SLR, correlation 
+between
+x and y eqauls square root of rSquared
+
+generraly correlation equals
+cat(  " cov(x,y)/( sd(x)*sd(y) )  )"
+with(d2,  cov(len,dose)/( sd(dose)*sd(len) )   )
+
+Pearson’s correlation coefficient is 
+the test statistics that measures the 
+statistical relationship, or association, 
+between two continuous variables.  
+It is known as the best method of measuring
+the association between variables of interest because
+it is based on the method of covariance.
+
+oNe strong assumption must hold
+Linear relationship: Two variables 
+should be linearly related to each other. 
+This can be assessed with a scatterplot: 
+plot the value of variables on a scatter diagram, 
+and check if the plot yields
+a relatively straight line.
+
+
+#1.8 -  Cautions
+
+A large  value does not imply that the estimated 
+regression line fits the data well.
+
+list.files()
+d3<-read.csv("carstopping.csv") %>% as_tibble()
+ggplot(data=d3,aes(x=Speed,y=StopDist)) + 
+       geom_point(col="red")+geom_smooth(method="lm")
+Plot shows positive stong association between
+variable with upward trend
+
+m<-lm(StopDist~Speed,data=d3)
+summary(m)$r.squared
+A large percent of variation can be explained 
+via Dit value
+
+p1<-with(d3, sum((StopDist-mean(StopDist))^2)  )
+p2<-with(d3, sum((fitted(m)-mean(StopDist))^2)  )
+p2/p1
+
+
+#2
+file.create("mccoo.csv")
+d3<-read.csv("mccoo.csv") %>% as_tibble()
+ggplot(data=d3,aes(x=McCoo,y=Score)) + 
+  geom_point(col="red")+geom_smooth(method="lm")
+m<-lm(McCoo~Score,data=d3)
+summary(m)$r.squared
+
+m<-lm(McCoo~Score,data=d3)
+summary(m)$r.square
+
+d33<-filter(d3,McCoo!=206)
+m<-lm(McCoo~Score,data=d33)
+summary(m)$r.squared
+
+
+#3
+We shoul dkeep in mind that
+The predictor x does indeed cause the
+changes in the response y.
+
+The causal relation may instead be reversed. That is, the response y 
+may cause the changes in the predictor x.
+
+The predictor x is a contributing but not sole cause of 
+changes in the response variable y.
+
+There may be a "lurking variable" 
+is the real cause of changes in y 
+but also is associated with x, 
+thus giving rise to the observed 
+relationship between x and y.
+
+The association may be purely coincidental.
+
+#3
+d3<-read.csv("drugdea.csv") %>% as_tibble()
+names(d3)
+
+ggplot(data=d3,aes(x=budget,y=deaths))+  
+           geom_point(col="red")+
+          geom_smooth(method="lm")
+summary( lm(deaths~budget,data=d3))$r.squared
+
+ggplot(data=d3,aes(y=budget,x=deaths))+  
+  geom_point(col="red")+
+  geom_smooth(method="lm")
+summary( lm(budget~deaths,data=d3))$r.squared
+
+ggplot(data=d3,aes(y=deaths,x=year))+  
+  geom_point(col="red")+
+  geom_smooth(method="lm")
+summary( lm(deaths~year,data=d3))$r.squared
+
+
+#4
+
+d3<-read.csv("infant.csv") %>% as_tibble()
+names(d3)
+
+ggplot(data=d3,aes(x=feeding,y=death))+  
+  geom_point(col="red")+
+  geom_smooth(method="lm")
+
+summary( lm(death~feeding,data=d3))$r.squared
+
+ggplot(data=d3,aes(x=water,y=death))+  
+  geom_point(col="red")+
+  geom_smooth(method="lm")
+
+summary( lm(death~water,data=d3))$r.squared
+
+Water is a lurking variable here and is likely the 
+real driver behind infant death rates.
+
+
+#5
+
+d3<-read.csv("practical.csv") %>% as_tibble()
+names(d3)
+ggplot(data=d3,aes(x=x,y=y))+  
+  geom_point(col="red")+
+  geom_smooth(method="lm")
+
+m<-lm(y~x,data=d3)
+summary(m)
+with(d3,cor(x,y) )
+
+The large sample size results in a sample 
+slope that is significantly different 
+from 0, but not meaningfully different
+from 0. The scatterplot, which should 
+always accompany a simple linear 
+regression analysis, illustrates.
+
+b1<-coefficients(m)[2]
+c(b1-2*0.005576,b1+2*0.005576   )
+
+lets collect 100 balues of b1
+col_b1<-as.vector(rep(0,100),mode="numeric")
+
+f1<-function(a){
+  x1<-slice_sample(a,prop=0.5)
+  mf.2<-lm(y~x,data=x1)
+  out1<-coefficients(mf.2)[2]
+  return(out1)
+}
+
+f1(d3)
+
+col_b1<-replicate( 1000,f1(d3) ) %>% unname()
+c(b1-2*0.005576,b1+2*0.005576   )
+# here we estimate conf limits with simulation
+
+
+#6
+
+d3<-read.csv("oldfaithful.csv") %>% as_tibble()
+names(d3)
+ggplot(data=d3,aes(x=duration,y=next.))+  
+  geom_point(col="red")+
+  geom_smooth(method="lm")
+
+m<-lm(next.~duration,data=d3)
+summary(m)
+with(d3,cor(x,y) )
 
 
 
