@@ -638,8 +638,8 @@ cat(  " cov(x,y)/( sd(x)*sd(y) )  )"
       summary(m1) 
       
       This is how we estimate sd of betta
-    mse<- sqrt( sum(residuals(m1)^2 )/47 )
-    se<-mse/with(d1, sqrt(sum((Lat-mean(Lat))^2) ) )
+      mse<- sqrt( sum(residuals(m1)^2 )/47 )
+      se<-mse/with(d1, sqrt(sum((Lat-mean(Lat))^2) ) )
       -5.9776/se # this is t value as we assume that true betta is 0
       
       #therefore, betta is to far from mean of 0
@@ -654,7 +654,7 @@ cat(  " cov(x,y)/( sd(x)*sd(y) )  )"
       true population slope 
       is beteween the respective values.
       
- # following factors affect width of confidence
+      # following factors affect width of confidence
       interval:
         Recall that, in general, we want 
       our confidence intervals to be as narrow 
@@ -664,169 +664,277 @@ cat(  " cov(x,y)/( sd(x)*sd(y) )  )"
       them to ensure that we obtain a narrow interval. 
       
       formula is the following
-cat(  "t* (Res_St_Er/ sqrt(SSX) ) "   )      
+      cat(  "t* (Res_St_Er/ sqrt(SSX) ) "   )      
       
-t as constant should reflect value for at least 90%
-As t decrease Ci also decreases
-notice , we can use confint.lm() to
-we estimate cond intervals for betta1
-
-As MSE decreases , CI wisth also decreases.
-The value of MSE depends on only two factors —
-how much the responses vary naturally around 
-the estimated regression line, and how well your
-regression function (line) fits the data.
-
-The more spreas out the predictor is 
-x-mean(x), which shows the spread of predictor,
-the larder is denominator,the smaller,
-narrower is the interval.
-Therefore , we can decrease interval ensuring that
-data is spread out.
-
-
-Moreoverm the grewater is the samle, larger is
-n-1 and hence width of CI becomes smaller.
-
-
-## What if we cant rehect H0 and betta is not
-signifficatlt dirretect from 0:
-We committed a Type II error. That is,
-in reality  and our sample data just didnt 
-provide enough evidence to conclude that ≠ 0
-
-There really is not much of a linear
-relationship between x and y.
-
-There is a relationship between
-x and y — it is just not linear.
-
-Again, generally CI is estimated via:
-  cat(" sample estimate +- t*SE ")
-
-d1<-read.csv("Reg_Datasets//leadcord.csv") %>%
-  as_tibble()
-
-m1<-lm(Cord~Sold,data=d1) 
-summary(m1) 
-ggplot(data=d1,aes(Cord,Sold) )+
-       geom_point(col="red")+
+      t as constant should reflect value for at least 90%
+      As t decrease Ci also decreases
+      notice , we can use confint.lm() to
+      we estimate cond intervals for betta1
+      
+      As MSE decreases , CI wisth also decreases.
+      The value of MSE depends on only two factors —
+      how much the responses vary naturally around 
+      the estimated regression line, and how well your
+      regression function (line) fits the data.
+      
+      The more spreas out the predictor is 
+      x-mean(x), which shows the spread of predictor,
+      the larder is denominator,the smaller,
+      narrower is the interval.
+      Therefore , we can decrease interval ensuring that
+      data is spread out.
+      
+      
+      Moreoverm the grewater is the samle, larger is
+      n-1 and hence width of CI becomes smaller.
+      
+      
+      ## What if we cant rehect H0 and betta is not
+      signifficatlt dirretect from 0:
+        We committed a Type II error. That is,
+      in reality  and our sample data just didnt 
+      provide enough evidence to conclude that ≠ 0
+      
+      There really is not much of a linear
+      relationship between x and y.
+      
+      There is a relationship between
+      x and y — it is just not linear.
+      
+      Again, generally CI is estimated via:
+        cat(" sample estimate +- t*SE ")
+      
+      d1<-read.csv("Reg_Datasets//leadcord.csv") %>%
+        as_tibble()
+      
+      m1<-lm(Cord~Sold,data=d1) 
+      summary(m1) 
+      ggplot(data=d1,aes(Cord,Sold) )+
+        geom_point(col="red")+
         geom_smooth(method="lm")
-
-confint(m1)
-
-
-#2.3 - Sums of Squares
-d1<-read.csv("Reg_Datasets//skin.csv") %>%
-  as_tibble()
-
-m1<-lm(Mort~Lat,data=d1) 
-summary(m1) 
-ggplot(data=d1,aes(Lat,Mort) )+
-  geom_point(col="red")+
-  geom_smooth(method="lm")
-
-confint(m1)
-# let suse Ci and hyphothesis testing to
-check if there are linear relationsships between
-x and y, in other words betta is dofferent from 0
-
-mse<-sd( residuals(m1) )
-se<-mse/ sqrt(sum((d1$Lat-mean(d1$Lat))^2))
-t_stat<--5.9776/se
-
-There is alernttive way to check presence of 
-linear relationships, 
-speficically F test, analysis of variance.
-So fot t stat we havel p values
-We have p values for F stat as well.
-Both are random variables
-
-Now lest fo back to
-RSS, ESS TSS
-
-ggplot(data=d1,aes(Lat,Mort) )+
-  geom_point(col="red")+
-  geom_smooth(method="lm")+
-  geom_hline(yintercept = mean(d1$Mort),col="green" )
-
-TSS<-with(d1, sum((Mort-mean(Mort))^2) )
-this is distance between no relations value
-agains observations
-
-ESS<-with(d1, sum((Mort-fitted(m1))^2) )      
-The distance of each observed value 
-from the estimated regression line       
       
-RSS<-with(d1, sum((fitted(m1)-mean(Mort))^2) )     
-The distance of each fitted value  from the 
-no regression line  is       
-
-Therefore diviations from mean are explained by 2 
-components. If RSS is large enouthd, 
-model fits data well, demonstating it
-thtough r squared values
-summary(m1)$r.squared
+      confint(m1)
       
       
-#2.4 - Sums of Squares (continued)
+      #2.3 - Sums of Squares
+      d1<-read.csv("Reg_Datasets//skin.csv") %>%
+        as_tibble()
+      
+      m1<-lm(Mort~Lat,data=d1) 
+      summary(m1) 
+      ggplot(data=d1,aes(Lat,Mort) )+
+        geom_point(col="red")+
+        geom_smooth(method="lm")
+      
+      confint(m1)
+      # let suse Ci and hyphothesis testing to
+      check if there are linear relationsships between
+      x and y, in other words betta is dofferent from 0
+      
+      mse<-sd( residuals(m1) )
+      se<-mse/ sqrt(sum((d1$Lat-mean(d1$Lat))^2))
+      t_stat<--5.9776/se
+      
+      There is alernttive way to check presence of 
+      linear relationships, 
+      speficically F test, analysis of variance.
+      So fot t stat we havel p values
+      We have p values for F stat as well.
+      Both are random variables
+      
+      Now lest fo back to
+      RSS, ESS TSS
+      
+      ggplot(data=d1,aes(Lat,Mort) )+
+        geom_point(col="red")+
+        geom_smooth(method="lm")+
+        geom_hline(yintercept = mean(d1$Mort),col="green" )
+      
+      TSS<-with(d1, sum((Mort-mean(Mort))^2) )
+      this is distance between no relations value
+      agains observations
+      
+      ESS<-with(d1, sum((Mort-fitted(m1))^2) )      
+      The distance of each observed value 
+      from the estimated regression line       
+      
+      RSS<-with(d1, sum((fitted(m1)-mean(Mort))^2) )     
+      The distance of each fitted value  from the 
+      no regression line  is       
+      
+      Therefore diviations from mean are explained by 2 
+      components. If RSS is large enouthd, 
+      model fits data well, demonstating it
+      thtough r squared values
+      summary(m1)$r.squared
+      
+      
+      #2.4 - Sums of Squares (continued)
+      
+      Now agains , can we check presence of
+      linear relations using not means 
+      but varinca
+      
+      d1<-read.csv("Reg_Datasets//hgpa.csv") %>%
+        as_tibble()
+      
+      m1<-lm(height~gpa,data=d1) 
+      summary(m1) 
+      ggplot(data=d1,aes(height,gpa) )+
+        geom_point(col="red")+
+        geom_smooth(method="lm")
+      
+      confint(m1)
+      Here coninf includes 0
+      summary(m1)
+      and betta is not sognifficantly different 
+      from 0
+      here is not enough statistical evidence to 
+      conclude that the slope is not 0.
+      We conclude that there is no linear relationship
+      between height and grade point average.
+      
+      Following R squaredm we conclude that 
+      vary liitle if the vatriations can be attributed to
+      height.
+      
+      #2.5 - Analysis of Variance: The Basic Idea
+      
+      TSS can be broken into
+      RSS and ESS.
+      If the regression sum of squares is a "large" 
+      component of the total sum of squares, it suggests that there is a linear association between 
+      the predictor x and the response y.
+      
+      
+      #2.6 - The Analysis 
+      of Variance (ANOVA) table and the F-test
+      
+      d1<-read.csv("Reg_Datasets//skin.csv") %>%
+        as_tibble()
+      
+      m1<-lm(Mort~Lat,data=d1) 
+      summary(m1) 
+      ggplot(data=d1,aes(Lat,Mort) )+
+        geom_point(col="red")+
+        geom_smooth(method="lm")
+      
+      confint(m1)
+      
+      degree of fredom fot
+      SSTO is just n-1,
+      for ESS its n-2, for SSR is n-1
+      
+      cat("mse=  ESS/n-2  ") $ sd for regression errots
+      cat("msr=sum((fitted-mean)^2)")
+      
+      
+one more time to start before F test and ANOVA
 
-Now agains , can we check presence of
-linear relations using not means 
-but varinca
+cat( "mse=sse/n-1" ) # this is variacne of error term
+car("msr=ssr/1")# this ia ao,p;y sum of differences between
+fitted values and mean
+We dividew by n-1 bacause the repsctive values
+are dirived from sample.
 
-d1<-read.csv("Reg_Datasets//hgpa.csv") %>%
-  as_tibble()
+Therefore, we can use the respective measures to test null
+hyphothesis.
 
-m1<-lm(height~gpa,data=d1) 
-summary(m1) 
-ggplot(data=d1,aes(height,gpa) )+
-  geom_point(col="red")+
-  geom_smooth(method="lm")
-
-confint(m1)
-Here coninf includes 0
-summary(m1)
-and betta is not sognifficantly different 
-from 0
-here is not enough statistical evidence to 
-conclude that the slope is not 0.
-We conclude that there is no linear relationship
-between height and grade point average.
-
-Following R squaredm we conclude that 
-vary liitle if the vatriations can be attributed to
-height.
-
-#2.5 - Analysis of Variance: The Basic Idea
-
-TSS can be broken into
-RSS and ESS.
-If the regression sum of squares is a "large" 
-component of the total sum of squares, it suggests that there is a linear association between 
-the predictor x and the response y.
+Lets simulate different values for MSR
 
 
-#2.6 - The Analysis 
-of Variance (ANOVA) table and the F-test
+col_b1<-as.vector(rep(0,100),mode="numeric")
 
-d1<-read.csv("Reg_Datasets//skin.csv") %>%
-  as_tibble()
+f1<-function(x){
+  x1<-slice_sample(x,prop=0.5)
+  mf.2<-lm(Mort~Lat,data=x1)
+  out1<- sum( ( fitted(mf.2)-mean(x1$Mort)  )^2 )
+  # the respective value is not part of sratistics
+  # and it is not residual standard error
+  return(out1)
+}
 
-m1<-lm(Mort~Lat,data=d1) 
-summary(m1) 
-ggplot(data=d1,aes(Lat,Mort) )+
-  geom_point(col="red")+
-  geom_smooth(method="lm")
+f1(d1)
 
-confint(m1)
+col_b1<-replicate( 1000,f1(d1) ) %>% unname()
+hist(col_b1,breaks = 40)
+mean(col_b1)
+sqrt(mean(col_b1))
+      
+if netts is 0 then ratio MSR/MSE shoul be 1
 
-degree of fredom fot
-SSTO is just n-1,
-for ESS its n-2, for SSR is n-1
+F statistics is MSR/MSE or SSR/MSE for SLR
+therefore is is ration of 2 variance ans n-1 in cancelled
+      
+The residual sum of squares measures ESS
+the amount of error remaining
+between the regression function and the data set.      
+      
+p1<-sum( ( fitted(m1)-mean(d1$Mort)  )^2 )  
+mse<-sum(residuals(m1)^2)
+f<-p1/mse      
+      
+As always, the P-value is obtained by answering the question:
+What is the probability that we’d get an F
+statistic as large as we did, 
+if the null hypothesis is true?   
 
-cat("mse=  ESS/n-2  ") $ sd for regression errots
-cat("msr=sum((fitted-mean)^2)")
+ d1<-read.csv("Reg_Datasets//mens200m.csv") %>%
+        as_tibble()
+      
+      m1<-lm(Men200m~Year,data=d1) 
+      summary(m1) 
+      ggplot(data=d1,aes(Year,Men200m) )+
+        geom_point(col="red")+
+        geom_smooth(method="lm")
+      
+      confint(m1)    
+rss<-sum( ( fitted(m1)-mean(d1$Men200m)  )^2 )    
+ess<-sum( ( d1$Men200m-fitted(m1)  )^2 )   
+       sum( ( residuals(m1)  )^2 )   
+      
+residua_error<-sqrt(ess)  
+     
+
+# Equivalent linear relationship tests
+overall following methods are appropriate to test presence
+of linear relationships
+t test, ANOVA  and cond intervals
+
+One more, RSS  should be used to determine
+how much of the total error is due to lack of model
+fitm we determine how far the average 
+observed response at each x-value is from the predicted 
+response of each data point. 
+
+Therefore, fitted value minuas mean respose sed
+with TSS is used to determine lack of fit.
+
+To determine how much of the total error is due to just random error, we determine how far each observed response is from
+the average observed response at each x-value.
+this iS TSS
+
+#### Lesson 3: SLR Estimation & Prediction
+regeresion analysis involves
+model formulation
+model estimation
+model evaluation and 
+model use
+
+,ean of y showns mean response withput
+taking into account x variable, therefore, regression
+shows conditiona mean of y.
+
+Con make a forecastmbecause we deal with
+samples, we need to estomate 
+CI for intervam mean and prediction 
+intervalf ro new value. Mean and single 
+observations therefore. 
+
+#Confidence Interval for the Mean Response
+Ci intevals is usually about estimatinf
+t value
+cat("sample estimate +- t * se of estimate")
 
 
 
@@ -835,43 +943,3 @@ cat("msr=sum((fitted-mean)^2)")
 
 
 
-
-
-
-
-
-
-
-
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
