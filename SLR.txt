@@ -829,57 +829,57 @@ cat(  " cov(x,y)/( sd(x)*sd(y) )  )"
       cat("msr=sum((fitted-mean)^2)")
       
       
-one more time to start before F test and ANOVA
-
-cat( "mse=sse/n-1" ) # this is variacne of error term
-car("msr=ssr/1")# this ia ao,p;y sum of differences between
-fitted values and mean
-We dividew by n-1 bacause the repsctive values
-are dirived from sample.
-
-Therefore, we can use the respective measures to test null
-hyphothesis.
-
-Lets simulate different values for MSR
-
-
-col_b1<-as.vector(rep(0,100),mode="numeric")
-
-f1<-function(x){
-  x1<-slice_sample(x,prop=0.5)
-  mf.2<-lm(Mort~Lat,data=x1)
-  out1<- sum( ( fitted(mf.2)-mean(x1$Mort)  )^2 )
-  # the respective value is not part of sratistics
-  # and it is not residual standard error
-  return(out1)
-}
-
-f1(d1)
-
-col_b1<-replicate( 1000,f1(d1) ) %>% unname()
-hist(col_b1,breaks = 40)
-mean(col_b1)
-sqrt(mean(col_b1))
+      one more time to start before F test and ANOVA
       
-if netts is 0 then ratio MSR/MSE shoul be 1
-
-F statistics is MSR/MSE or SSR/MSE for SLR
-therefore is is ration of 2 variance ans n-1 in cancelled
+      cat( "mse=sse/n-1" ) # this is variacne of error term
+      car("msr=ssr/1")# this ia ao,p;y sum of differences between
+      fitted values and mean
+      We dividew by n-1 bacause the repsctive values
+      are dirived from sample.
       
-The residual sum of squares measures ESS
-the amount of error remaining
-between the regression function and the data set.      
+      Therefore, we can use the respective measures to test null
+      hyphothesis.
       
-p1<-sum( ( fitted(m1)-mean(d1$Mort)  )^2 )  
-mse<-sum(residuals(m1)^2)
-f<-p1/mse      
+      Lets simulate different values for MSR
       
-As always, the P-value is obtained by answering the question:
-What is the probability that we’d get an F
-statistic as large as we did, 
-if the null hypothesis is true?   
-
- d1<-read.csv("Reg_Datasets//mens200m.csv") %>%
+      
+      col_b1<-as.vector(rep(0,100),mode="numeric")
+      
+      f1<-function(x){
+        x1<-slice_sample(x,prop=0.5)
+        mf.2<-lm(Mort~Lat,data=x1)
+        out1<- sum( ( fitted(mf.2)-mean(x1$Mort)  )^2 )
+        # the respective value is not part of sratistics
+        # and it is not residual standard error
+        return(out1)
+      }
+      
+      f1(d1)
+      
+      col_b1<-replicate( 1000,f1(d1) ) %>% unname()
+      hist(col_b1,breaks = 40)
+      mean(col_b1)
+      sqrt(mean(col_b1))
+      
+      if netts is 0 then ratio MSR/MSE shoul be 1
+      
+      F statistics is MSR/MSE or SSR/MSE for SLR
+      therefore is is ration of 2 variance ans n-1 in cancelled
+      
+      The residual sum of squares measures ESS
+      the amount of error remaining
+      between the regression function and the data set.      
+      
+      p1<-sum( ( fitted(m1)-mean(d1$Mort)  )^2 )  
+      mse<-sum(residuals(m1)^2)
+      f<-p1/mse      
+      
+      As always, the P-value is obtained by answering the question:
+        What is the probability that we’d get an F
+      statistic as large as we did, 
+      if the null hypothesis is true?   
+        
+        d1<-read.csv("Reg_Datasets//mens200m.csv") %>%
         as_tibble()
       
       m1<-lm(Men200m~Year,data=d1) 
@@ -889,57 +889,164 @@ if the null hypothesis is true?
         geom_smooth(method="lm")
       
       confint(m1)    
-rss<-sum( ( fitted(m1)-mean(d1$Men200m)  )^2 )    
-ess<-sum( ( d1$Men200m-fitted(m1)  )^2 )   
-       sum( ( residuals(m1)  )^2 )   
+      rss<-sum( ( fitted(m1)-mean(d1$Men200m)  )^2 )    
+      ess<-sum( ( d1$Men200m-fitted(m1)  )^2 )   
+      sum( ( residuals(m1)  )^2 )   
       
-residua_error<-sqrt(ess)  
-     
+      residua_error<-sqrt(ess)  
+      
+      
+      # Equivalent linear relationship tests
+      overall following methods are appropriate to test presence
+      of linear relationships
+      t test, ANOVA  and cond intervals
+      
+      One more, RSS  should be used to determine
+      how much of the total error is due to lack of model
+      fitm we determine how far the average 
+      observed response at each x-value is from the predicted 
+      response of each data point. 
+      
+      Therefore, fitted value minuas mean respose sed
+      with TSS is used to determine lack of fit.
+      
+      To determine how much of the total error is due to just random error, we determine how far each observed response is from
+      the average observed response at each x-value.
+      this iS TSS
+      
+      #### Lesson 3: SLR Estimation & Prediction
+      regeresion analysis involves
+      model formulation
+      model estimation
+      model evaluation and 
+      model use
+      
+      ,ean of y showns mean response withput
+      taking into account x variable, therefore, regression
+      shows conditiona mean of y.
+      
+      Con make a forecastmbecause we deal with
+      samples, we need to estomate 
+      CI for intervam mean and prediction 
+      intervalf ro new value. Mean and single 
+      observations therefore. 
+      
+      #Confidence Interval for the Mean Response
+      Ci intevals is usually about estimatinf
+      t value
+      cat("sample estimate +- t * se of estimate")
+      
+#4.1 - Background
+  
+      # 4 conditon  should be applied sot he
+# linear regression is meaningfull from inference point of view
+      
+Mean response if y is lineat function of x
 
-# Equivalent linear relationship tests
-overall following methods are appropriate to test presence
-of linear relationships
-t test, ANOVA  and cond intervals
+Errors are independen and mormally distibuted
 
-One more, RSS  should be used to determine
-how much of the total error is due to lack of model
-fitm we determine how far the average 
-observed response at each x-value is from the predicted 
-response of each data point. 
+Errors at each value of predictor have
+equla variance.
 
-Therefore, fitted value minuas mean respose sed
-with TSS is used to determine lack of fit.
+overall assumpton imply that
+errors shoud be independent , indentically
+distributed random varibale.
 
-To determine how much of the total error is due to just random error, we determine how far each observed response is from
-the average observed response at each x-value.
-this iS TSS
+Therefore , the follwong errors may apper:
+  
+lerations are not linear,
+and errores are nt IID
 
-#### Lesson 3: SLR Estimation & Prediction
-regeresion analysis involves
-model formulation
-model estimation
-model evaluation and 
-model use
+We shoukd also be able to identify outliers and
+check if our regression misses importat
+expanatory variable
 
-,ean of y showns mean response withput
-taking into account x variable, therefore, regression
-shows conditiona mean of y.
+All tests and intervals are very sensitive to 
+even minor departures from independence as
+they are calculated directly from residuals
 
-Con make a forecastmbecause we deal with
-samples, we need to estomate 
-CI for intervam mean and prediction 
-intervalf ro new value. Mean and single 
-observations therefore. 
+The hypothesis tests and confidence intervals for  coef
+and  are fairly "robust" 
+(that is, forgiving) against departures from normality.
 
-#Confidence Interval for the Mean Response
-Ci intevals is usually about estimatinf
-t value
-cat("sample estimate +- t * se of estimate")
+Prediction intervals are quite
+sensitive to departures from normality.
+
+  All starts with 
+  residul.
+  cat( "e=yi-yf" )
+
+  When conducting a residual analysis, 
+  a "residuals versus fits plot" 
+  is the most frequently created plot. 
+
+  The plot is used to detect non-linearity,
+  unequal error variances, and outliers.
+  
+ we want that  And, it illustrates that 
+ the variation around the estimated regression line is constant suggesting
+ that the assumption of equal error variances is reasonable. 
+  
+ d1<-read.csv("Reg_Datasets//alcstren.csv") %>%
+   as_tibble()
+ 
+ m1<-lm(strength~alcohol,data=d1) 
+ summary(m1) 
+ ggplot(data=d1,aes(alcohol,strength) )+
+   geom_point(col="red")+
+   geom_smooth(method="lm")
+ 
+ confint(m1)     
+ 
+ plot(x=fitted(m1)  ,y=residuals(m1) )
+  
+ Value of 0 appear for the perfect fit. 
+  
+Why the plot works:
+  
+The residuals "bounce randomly" around the residual = 0 line.
+This suggests that the 
+assumption that the relationship is linear is reasonable.  
+
+The residuals roughly form a "horizontal band" around the residual = 0 line. This suggests
+that the variances of the error terms are equal.
+
+No one residual "stands out" from the basic random pattern of residuals. 
+This suggests that there are no outliers.
+  
+  
+#4.3 - Residuals vs. Predictor Plot
+
+the residuals vs. predictor plot offers no new
+information to that which is 
+already learned by the residuals vs. fits plot.
+  
+But it cal help to accees contribution of x values
+candidates.
+If we formed a regression , we can plot estomated residuals
+agains candidate for x to find possible 
+pattern between resudualt and unused candidate.
+
+If a plot of the "new response" against 
+a predictor shows a non-random pattern, it indicates 
+that the predictor explains some of the 
+remaining variability in the new (adjusted) response. 
+Threfore, new predictor can explain remainig 
+variability in data.
+
+If new x candidate versus estimated resuduals
+does not indicate pattern,no significant amount of
+the remaining variability 
+can be explained by the individuals' durations.
 
 
 
+  
+  
+  
+  
 
 
-
-
+  
+  
 
