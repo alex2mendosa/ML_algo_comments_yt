@@ -124,13 +124,6 @@ which( sapply(db1,typeof)=="character" )
 
 
 
-
-
-
-
-
-
-
 # 2 Importing dataset
 
 #! The working directory is just a file 
@@ -206,9 +199,6 @@ readxl::excel_sheets()
 # read.xlsx for excel files.
 
 
-
-
-
 # 3 Taking care of Missing Data
 
 #lets create sample vector with 4 NA Values
@@ -239,9 +229,6 @@ na.omit(vector_1) # to prop NA values
 # if you are discourage with atribures list,  we can remove it 
 # by converting  vector_1 to numeric type
 as.numeric(na.omit(vector_1))
-
-
-
 
 
 # What about 2 dimentional structures like data frames or tibble
@@ -296,17 +283,3 @@ mode_z<-names( which.max(table(DF$z)) )
 replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),y=mean(DF$y,na.rm = TRUE),
                     z=mode_z) )
 
-
-
-# 4 Splitting the dataset
-# this skiils is crusil one, machine learning 
-#is about letting  machine to find relations which
-# we cannot observe
-
-indices<-1:nrow(db1)
-ind_train<-sample(indices,size=20)
-ind_test<- indices[ !(indices %in% ind_train) ]
-
-# we canr create random indices and reshagle data
-indices<-sample(1:nrow(db1),replace = FALSE)
-db1[indices,]
