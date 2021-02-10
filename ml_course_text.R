@@ -1,13 +1,17 @@
+# we would require 3 libraries to 
+# fully exolore potential and options of data processing
 library(dplyr)
 library(tibble)
 library(tidyr)
 
-            # 1 Dataset description
+# 1 Dataset description
 
 db1<-as.data.frame(mtcars,rownames = NA)
 db1<-rownames_to_column(db1,var="Model")
 db1["Manufacturer"]<-sapply(strsplit(db1$Model," "),function(x) x[[1]]) 
 db1<-select(db1,Manufacturer,everything(), -c(gear,carb,drat))
+# Here I modify mtcars data set by adding 2 columns
+
 
 # to describe dataset, we requre fucntions which can
 # compactly display information contained in data
@@ -17,56 +21,62 @@ db1<-select(db1,Manufacturer,everything(), -c(gear,carb,drat))
 str() 
 str(db1)
 # here we can check name of each column,
-# after "colon" type of data is indicated,
+# after "colon",  type of data is indicated,
 # next we can check sample of data each column contains
-#usually the respective fucntion is not accompanied
+# usually the respective fucntion is not accompanied
 # with additional arguments
 
 #! str() will be really useful when we are 
-#! unsure about the contents of an object as
-#! it will help us take a quick preview of the 
-#! contents and structure of the object. This will 
-#! also help in revealing issues in the naming of the 
-#! columns, class of the content, etc, if any exist.
+#! unsure about the contents of an data object.
+#! Fucntion allows quick preview of the 
+#! contents and structure. This will 
+#! also help in revealing issues in column names
+#! type of data, presence of missing values, if any exist.
 
 
 
-#We can also use View() function to fully explicityly check 
+#We can also use View() function to fully, explicityly check 
 #all records in data structure, similar to spreadsheet-style
 View(db1)
 # Data is displayed in separate window
+#window name inherits name of argument
 
-
-#another  2 sommon methods are used to check last or first records of
+#another  2 sommon methods are used to check
+#last or first records of
 # data structure
 tail(db1,10)
 head(db1,10)
 # index of rows can give an idea how many rows data
 #structure contains
 
-#We can combine expressins woth View function 
+#We can combine head and tail with View fucntion
 View( tail(db1,10)  )
 View( head(db1,10)  )
 # View usually is used withou additional
 #arguments, however we can sypply title 
-#paramente to make window name more informative
-View( tail(db1,10),title="Last 10 Observations"  )
+#parameter to make window name more informative
+View( tail(db1,10),title="Last_10_Observations"  )
 
 
-# another approach requires convergence of data to tibble
+# another approach to 
+#visually inspect data onbect 
+#requires convergence of data to tibble
 as_tibble(db1)
 # here under column name we have description of data type,
-# and forst top 10 records are displayed
+# and first 10 records are displayed
+# as_tibble is alco used to convert object to 
+# tibble class. 
 
 # another approach requres yse of glimse fucntion from
 # tibble library
 glimpse(db1)
 
-# glimse easily allows to check sample records and data type
+# glimse easily allows to check sample records and data type.
 # in contrast to str(), glimpse displays 
 #as many records as possible to fit the screen
+# just expans console and run 2 commands
 
-# and finally ,rarely used , but still , edut function
+# and finally ,rarely used , but still , edit() function
 # to start text like editor of data frame
 edit(db1) # Open data editor
 # db1 is not changed, however, we can store 
@@ -75,34 +85,31 @@ edit(db1) # Open data editor
 db2<-edit(db1)
 # fucntion can be usefull to edit small structures but
 # for large datasets with hundreds of records, 
-#it is better to use more efficient code
-#base approaches
+#it is better to avoid manual manipulations
 
 
 # addtional  tool is to use summary function 
 summary(db1)
-# A very useful multipurpose function in R is summary(X), 
-# where X can be one
-# of any number of objects, including datasets, variables
-
-#here as outut we get statistical properties of
-# ech column, nor numeric data we get measure of spred
+# A very useful multipurpose function in R, summary(X), 
+# displays statistical properties of
+# ech column, for numeric data we get measure of spred
 #and central tendency, for categorical data 
 # it is length and mode of data.
 
 #fucntion can be applied to specific columns
-summary(db1[, c("Manufacturer", "gear")])
+summary(db1[, c("Manufacturer", "hp")])
 
 
 # or,  we might be interested in names
 #assigned to columns
+# Knowledge og column names hepls to correcly define input
+# varialbes
 names(db1)
 
 # here is a common way to check indices of column which 
 # are of our interest 
-
 which( sapply(db1,typeof)=="character" )
-# we use sapply to call typeof fucntion on 
+# we use sapply to call typeof function on 
 #each column of db1, next we use which to
 #convert values of TRUE in indices. 
 
@@ -115,10 +122,6 @@ which( sapply(db1,typeof)=="character" )
 # avoid errors related to situation when a function 
 #is applied to an object of an incorrect type.
 
-# we need to know column names to 
-# address our calculations and
-# manipulations to specific  
-# parts of data structure
 
 
 
@@ -128,8 +131,7 @@ which( sapply(db1,typeof)=="character" )
 
 
 
-
-               # 2 Importing dataset
+# 2 Importing dataset
 
 #! The working directory is just a file 
 #! path on your computer that sets the default location 
@@ -207,7 +209,7 @@ readxl::excel_sheets()
 
 
 
-                     # 3 Taking care of Missing Data
+# 3 Taking care of Missing Data
 
 #lets create sample vector with 4 NA Values
 vector_1<-sample( c(rnorm(5,10,2)), 10, replace = TRUE)
@@ -257,7 +259,7 @@ na.omit(DF)
 apply(DF, MARGIN=1, is.na)
 # here logical vector is obtained
 apply(DF, MARGIN=1, function(x) !(any(is.na(x))) )
- # here are rows which contain at leat one na value
+# here are rows which contain at leat one na value
 DF[apply(DF, MARGIN=1, function(x) !(any(is.na(x))) ),]
 
 # solution to remove na are abunded , here is the option 
@@ -308,41 +310,3 @@ ind_test<- indices[ !(indices %in% ind_train) ]
 # we canr create random indices and reshagle data
 indices<-sample(1:nrow(db1),replace = FALSE)
 db1[indices,]
-
-# 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
