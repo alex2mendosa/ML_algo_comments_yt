@@ -1,38 +1,40 @@
 # we would require 3 libraries to 
-# fully exolore potential and options of data processing
+#  regorously exolore potential and options of data processing in R
 library(dplyr)
 library(tibble)
 library(tidyr)
+library(readr)
 
 # 1 Dataset description
 
 db1<-as.data.frame(mtcars,rownames = NA)
 db1<-rownames_to_column(db1,var="Model")
 db1["Manufacturer"]<-sapply(strsplit(db1$Model," "),function(x) x[[1]]) 
-db1<-select(db1,Manufacturer,everything(), -c(gear,carb,drat))
+db1<-select(db1,Manufacturer,everything(), 1:5)
 # Here I modify mtcars data set by adding 2 columns
 
-
-# to describe dataset, we requre fucntions which can
+# Analysis always start with aknowledgment of 
+# data object, how many columns, row it contains, datatype of columns,
+# presence of missing values ets.
+# To describe dataset, we requre fucntions which can
 # compactly display information contained in data
 # object
 
 # to explore dataset we can use
 str() 
-str(db1)
+str(db1)  
 # here we can check name of each column,
 # after "colon",  type of data is indicated,
 # next we can check sample of data each column contains
 # usually the respective fucntion is not accompanied
 # with additional arguments
 
-#! str() will be really useful when we are 
-#! unsure about the contents of an data object.
-#! Fucntion allows quick preview of the 
-#! contents and structure. This will 
-#! also help in revealing issues in column names
-#! type of data, presence of missing values, if any exist.
-
+# str() will be really useful when we are 
+# unaware about the content of data object.
+# Function allows quick preview of the 
+# contents and structure. Preview will 
+# help in revealing issues with column names,
+# type of data, presence of missing values, if any exist.
 
 
 #We can also use View() function to fully, explicityly check 
@@ -76,16 +78,19 @@ glimpse(db1)
 #as many records as possible to fit the screen
 # just expans console and run 2 commands
 
-# and finally ,rarely used , but still , edit() function
+# and finally ,rarely used , but quite intresting
+#, edit() function
 # to start text like editor of data frame
 edit(db1) # Open data editor
+View(db1)
 # db1 is not changed, however, we can store 
 # result of edditint into another variable
 
 db2<-edit(db1)
+View(db1)
 # fucntion can be usefull to edit small structures but
 # for large datasets with hundreds of records, 
-#it is better to avoid manual manipulations
+# it is better to avoid manual manipulations
 
 
 # addtional  tool is to use summary function 
@@ -94,17 +99,26 @@ summary(db1)
 # displays statistical properties of
 # ech column, for numeric data we get measure of spred
 #and central tendency, for categorical data 
-# it is length and mode of data.
+# it is length, in other owrds number of records.
+# word mode is not the most commom character, it 
+# indicate that data is stored character type. 
+# cosider its similar to type of data.
 
-#fucntion can be applied to specific columns
+#fucntion summary can be applied to specific columns
 summary(db1[, c("Manufacturer", "hp")])
 
 
 # or,  we might be interested in names
 #assigned to columns
-# Knowledge og column names hepls to correcly define input
-# varialbes
+# Knowledge of column names hepls to correcly assign values
+# to varialbes, for example , ican forhet
+# is column nemas written in upper or lower case
+l_100_km<-with(db1, 282.5/MPG)
 names(db1)
+l_100_km<-with(db1, 282.5/mpg)
+#mpg is not hard to remeber, but for conviluted column names
+# it always good to check how exactly they are writen.
+
 
 # here is a common way to check indices of column which 
 # are of our interest 
@@ -113,6 +127,8 @@ which( sapply(db1,typeof)=="character" )
 #each column of db1, next we use which to
 #convert values of TRUE in indices. 
 
+# now can extart the respective coluns
+db1[ ,which( sapply(db1,typeof)=="character" ) ]
 
 # to sum up, remeber and practice to use
 # str() ,  tail, head
@@ -120,18 +136,19 @@ which( sapply(db1,typeof)=="character" )
 # summary() functions to explore data before actual 
 # analysis. You need to know type of data to 
 # avoid errors related to situation when a function 
-#is applied to an object of an incorrect type.
+# is applied to an object of an incorrect type.
 
 
 
 # 2 Importing dataset
 
-#! The working directory is just a file 
-#! path on your computer that sets the default location 
-#! of any files you read into R, or save out of R.
+# Firt we reiterate notion of working directory:
+#! The working directory is  file 
+#! path  that sets the default location 
+#! of any files you read into or save out of R.
 # in other words, if file is located in 
 # workign category we can read data from it 
-#only using its name as argument.
+# only using its name as argument for read function
 
 # lets check our workign directiry
 getwd()
@@ -140,30 +157,68 @@ setwd()
 # another funtion is extremely isefull
 # to check wwhat files are located in directory
 list.files()
+# quite usefull to check correct name of file, extension or 
+# to import files via loop
+
+
 
 # lets assume that out data is located in CSV file
 # common way is to use read.csv fucntion 
+# File I would upload occupied more than million rows
+#lets check how fast it would be uploaded
 t1<-Sys.time()
-sample_1<-read.csv("1_in.csv")
+sample_1<-read.csv("1_in_sample.csv")
 Sys.time()-t1
 glimpse(sample_1)
+# our file had column names and by default read_csv
+# asumes that column naes exist
+
 # common paramenters to define
 # are header and stringsAsFactors
-
-sample_1<-read.csv("1_in.csv",header = FALSE)
+sample_1<-read.csv("1_in_sample.csv",header = FALSE)
 glimpse(sample_1)
+# R automacally assigned unique column names
 
-sample_1<-read.csv("1_in.csv",header = TRUE,stringsAsFactors = TRUE)
+sample_1<-read.csv("1_in_sample.csv",header = TRUE,stringsAsFactors = TRUE)
 glimpse(sample_1)
-# we will go back to factors later, but remember it
+# factors are used to addign behavoit of numbers to characters
+# we will go back to factors later, but remember 
 # if data in initial file is organised in 
-#spreadshit form, read.csv should perform well.
+# spreadshit form, where each column form a separate variable,
+# read.csv should perform very well.
+
+# one more work apect to remembet
+sample_1<-read.csv("1_in_sample.csv",header = TRUE)
+glimpse(sample_1)
+#Usually R is pretty god in distinguishing numbers from 
+# characters but for large files, it might conver all
+#records to characters
+sample_1<-read.csv("1_in_sample2.csv",header = TRUE)
+glimpse(sample_1)
+
+# Unless colClasses is specified,
+# all columns are read as character columns and then converted using
+# type.convert to logical, integer, numeric, complex
+# if all values are characters, read,csv fails to detect
+# approproate type
+
+# clearly some data are numbers but are imported as characters,
+#how to solve it:
+names(sample_1)
+sample_1<-read.csv("1_in_sample2.csv",header = TRUE,
+     colClasses=c('numeric','numeric','numeric','character','numeric',
+                  "character","character","character",
+                  'numeric','numeric','numeric') )
+glimpse(sample_1)
+# now is much better
 
 
+# There is better way both interms of speed and correct
+#data type coertion
 # lets check fucntion read_csv from readr
 # which demontrates faster perfomace fompate to read.csv
 t1<-Sys.time()
-sample_1<-readr::read_csv("1_in.csv")
+sample_1<-readr::read_csv("1_in_sample.csv")
 Sys.time()-t1
 # definately it workds faster for our large file
 # arguemnts to remember again are col_names insted of header
@@ -171,11 +226,17 @@ Sys.time()-t1
 # and it skips rows with no values.
 # also, by defauls , read_csv convers data to 
 # tibble which overall is more preferablle
-#than base data frame. 
+# than base data frame. 
+
+sample_1<-readr::read_csv("1_in_sample.csv", col_names = FALSE)
+ # as you can see , now actual column names form first record,
+# and therefore, al lcolumn are coerced to character type
 
 
-
+# CSV is a good mean to transfer data, but 
+# how about excel file
 # How to read form xlsx or xls file:
+# we would require 
 readxl::read_excel()
 # common arguments are sheet where we can specify
 #both name of sheet or its order
