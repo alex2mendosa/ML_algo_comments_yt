@@ -1,5 +1,5 @@
 #  we would require 5 libraries to 
-#  regorously exolore potential and options of data processing in R
+#   exolore potential and options of data preprocessing in R
 library(dplyr)
 library(tibble)
 library(tidyr)
@@ -20,7 +20,8 @@ db1<-select(db1,Manufacturer, 1:5)
 #and leaving 6 columns in total
 
 # Analysis always start with exploration of 
-# data object, how many columns, row it contains, datatype of columns,
+# data object, how many columns, row it contains, 
+# datatype of columns,
 # presence of missing values ets.
 # To describe dataset, we requre functions which can
 # compactly display information contained in data
@@ -49,9 +50,9 @@ View(db1)
 # window name inherits name of argument
 
 # how about size of object, here we can go with
-dim(db1)
-# fucntion is usefull in creating loops or 
-# debugging
+dim(db1) 
+#we get number of rows and columns
+
 
 # another  2 sommon methods are used to check
 # last or first records of
@@ -77,17 +78,20 @@ View( tail(db1,10),title="Last_10_Observations"  )
 tibble::as_tibble(db1)
 # here under column name we have description of data type,
 # and first 10 records are displayed
-# as_tibble is alco used to convert object to 
-# tibble class. This is not the fastest way and is
-# preferable whn you converge data frame to tibble
+# as_tibble is mainly used to convert object to 
+# tibble class and this is how
+# you should use it,
+# so its better yo use str or View fucntuon()
+
 
 # another approach requres use of glimse fucntion from
 # tibble library
 tibble::glimpse(db1)
 
-# glimse easily allows to check sample records and data type.
+# glimse easily allows to check
+# dimentions, sample records and data type.
 # in contrast to str(), glimpse displays 
-#as many records as possible to fit the screen
+# as many records as possible to fit the screen
 # just expans console and run 2 commands
 
 # and finally ,rarely used , but quite intresting
@@ -99,13 +103,13 @@ View(db1)
 # result of edditint into another variable
 
 db2<-edit(db1)
-View(db1)
+View(db2)
 # fucntion can be usefull to edit small structures but
 # for large datasets with hundreds of records, 
 # it is better to avoid manual manipulations
 
 
-# addtional  tool is to use summary function 
+# Next , more invasive approach, is to use summary function 
 summary(db1)
 # A very useful multipurpose function in R, summary(X), 
 # displays statistical properties of
@@ -113,7 +117,7 @@ summary(db1)
 # and central tendency, for categorical data 
 # it is length, in other owrds number of records.
 # word mode is not the most commom character, it 
-# indicate that data is stored character type. 
+# indicates that data is stored as character type. 
 # cosider its similar to type of data.
 
 #fucntion summary can be applied to specific columns
@@ -149,7 +153,9 @@ db1[ ,which( sapply(db1,typeof)=="character" ) ]
 # summary() functions to explore data before actual 
 # analysis. You need to know type of data to 
 # avoid errors related to situation when a function 
-# is applied to an object of an incorrect type.
+# is applied to an object of an incorrect type,
+# we need to know dimention and name of columns to
+# correctly define data transformation workflow
 
 
 
@@ -170,19 +176,21 @@ setwd()
 # another funtion is extremely isefull
 # to check wwhat files are located in directory
 list.files()
-# quite usefull to check correct name of file, extension or 
+# fucntion serves well
+# to check correct name of file, extension or 
 # to import files via loop
 
 
 # lets assume that out data is located in CSV file
+# in our working directory
 # common way is to use read.csv fucntion 
-# File I would upload occupied more than million rows
-#lets check how fast it would be uploaded
+# File I would upload occupies  almost million rows 
+# lets check how fast it would be uploaded
 t1<-Sys.time()
 sample_1<-read.csv("1_in_sample.csv")
 Sys.time()-t1
 glimpse(sample_1)
-# our file had column names and by default read_csv
+# data in our file has column names and by default read.csv
 # asumes that column names exist
 
 # common paramenters to remember
@@ -190,36 +198,39 @@ glimpse(sample_1)
 sample_1<-read.csv("1_in_sample.csv",header = FALSE)
 glimpse(sample_1)
 # R automacally assigned unique column names
+# notice that now all column are of character type
 
 sample_1<-read.csv("1_in_sample.csv",header = TRUE,stringsAsFactors = TRUE)
 glimpse(sample_1)
 # factors are used to add behaviour of numbers to characters
 # we will go back to factors later, but remember 
 # if data in initial file is organised in 
-# spreadshit form, where each column form a separate variable,
+# spreadshit form, where each column forms a separate variable,
 # read.csv should perform very well.
 
 # one more work apect to remembet
 sample_1<-read.csv("1_in_sample.csv",header = TRUE)
 glimpse(sample_1)
-# Usually R is pretty god in distinguishing numbers from 
+# R is pretty god in distinguishing numbers from 
 # characters 
 
-# Unless colClasses parameter is specified,read.csv() imports
+# read.csv() imports
 # all columns as character and then converte it to
 # logical, integer, numeric, complex, characters or factors
+# making the best guess which type of data 
+# is suited to values in column
 
 # what should we do if all record are worgly classified as
-#characters, to initiate this error we will  define 
-# column names, which are characters as
-# first row
+# characters, to initiate this error we will
+# make column names as first row value
+
 sample_1<-read.csv("1_in_sample.csv",header = FALSE)
 glimpse(sample_1)
 
 #how to solve it:
 names(sample_1)
 # not the best , but still a solution,
-#we can use colClasses argument to specify 
+# we can use colClasses argument to specify 
 #type of each column
 sample_1<-read.csv("1_in_sample.csv",header = FALSE,
                    colClasses=c('numeric','numeric','numeric','character','numeric',
@@ -227,11 +238,12 @@ sample_1<-read.csv("1_in_sample.csv",header = FALSE,
                                 'numeric','numeric','numeric') )
 glimpse(sample_1)
 # now is much better
-so remebner, read.csv with header,stringsasfactor and
-colclasses are very handy
+# so remebner, most common argument for
+# read.csv are header,stringsasfactor and
+# colclasses 
 
 
-# There is better way both interms of speed and correct
+# There is better way both in terms of speed and correct
 # data type coertion
 # lets check fucntion read_csv from readr
 # which demontrates faster perfomace fompate to read.csv
@@ -249,7 +261,8 @@ Sys.time()-t1
 sample_1<-readr::read_csv("1_in_sample.csv", col_names = FALSE)
 # as you can see , now actual column names form first record,
 # and therefore, all lcolumn are coerced to character type
-# so it you have and option use read_csv() as faster option
+# Overall, if 
+# possible use read_csv() as faster option
 
 # CSV is a good mean to transfer data, but 
 # how about excel file
@@ -280,7 +293,7 @@ readxl::excel_sheets()
 
 # 3 Taking care of Missing Data
 
-#lets create sample vector with 4 NA Values
+#lets create sample vector with  NA Values
 vector_1<-sample( c(rnorm(5,10,2)), 10, replace = TRUE)
 index_na<-sample( 1:10,3,replace=FALSE )
 vector_1[index_na]<-NA
@@ -400,4 +413,44 @@ mode_z<-names( which.max(table(DF$z)) )
 
 replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),y=mean(DF$y,na.rm = TRUE),
                     z=mode_z) )
+
+# I cant agree that any approach is codint can be classofied as
+# abused, but sometimes its good to leave for a while 
+# routine and try another solution, repalce_na is greate but lets have a look on another
+# oprion
+
+# first of all if_else
+
+ifelse( is.na(DF$x),mean(DF$x,na.rm = TRUE),DF$x) # or
+if_else( is.na(DF$x),mean(DF$x,na.rm = TRUE),DF$x) 
+
+# now to avoid typind doller accessor eact time , we can use
+# with to create envirinment
+
+with(DF, if_else( is.na(x),mean(x,na.rm = TRUE),x)  )
+
+# so far , if dealing with 2 dim object, i recommend to stich to 
+# replace na, other wise you will require to make 
+# user define function combined with apply family function
+
+# here the solution to the end of chapter
+
+rep_na<- function(x) {
+     if ( is.character(x)  ) {
+       mode_z<-names( which.max(table(x)) )
+       loc<-which(is.na(x))
+       x[loc]<-mode_z
+       return(x)
+     }  else {
+       loc<-which(is.na(x))
+       x[loc]<-mean(x,na.rm = TRUE)
+       return(x)
+             }  
+     }
+
+
+sapply( DF, rep_na )
+
+
+
 
