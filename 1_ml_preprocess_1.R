@@ -1,29 +1,37 @@
-# we would require 3 libraries to 
+#  we would require 5 libraries to 
 #  regorously exolore potential and options of data processing in R
 library(dplyr)
 library(tibble)
 library(tidyr)
 library(readr)
+library(readxl)
+
 
 # 1 Dataset description
+
+# lets create dataset and experiment over it.
+# dataset woul dbe based on mtcars dataset
 
 db1<-as.data.frame(mtcars,rownames = NA)
 db1<-rownames_to_column(db1,var="Model")
 db1["Manufacturer"]<-sapply(strsplit(db1$Model," "),function(x) x[[1]]) 
-db1<-select(db1,Manufacturer,everything(), 1:5)
+db1<-select(db1,Manufacturer, 1:5)
 # Here I modify mtcars data set by adding 2 columns
+#and leaving 6 columns in total
 
-# Analysis always start with aknowledgment of 
+# Analysis always start with exploration of 
 # data object, how many columns, row it contains, datatype of columns,
 # presence of missing values ets.
-# To describe dataset, we requre fucntions which can
+# To describe dataset, we requre functions which can
 # compactly display information contained in data
 # object
 
 # to explore dataset we can use
 str() 
 str(db1)  
-# here we can check name of each column,
+# here we can check number of rows, refered as observations
+# number of columns referred as variables
+# name of each column,
 # after "colon",  type of data is indicated,
 # next we can check sample of data each column contains
 # usually the respective fucntion is not accompanied
@@ -32,24 +40,27 @@ str(db1)
 # str() will be really useful when we are 
 # unaware about the content of data object.
 # Function allows quick preview of the 
-# contents and structure. Preview will 
-# help in revealing issues with column names,
-# type of data, presence of missing values, if any exist.
-
+# contents and structure. 
 
 #We can also use View() function to fully, explicityly check 
 #all records in data structure, similar to spreadsheet-style
 View(db1)
-# Data is displayed in separate window
-#window name inherits name of argument
+# Data is converiently displayed in separate window
+# window name inherits name of argument
 
-#another  2 sommon methods are used to check
-#last or first records of
-# data structure
+# how about size of object, here we can go with
+dim(db1)
+# fucntion is usefull in creating loops or 
+# debugging
+
+# another  2 sommon methods are used to check
+# last or first records of
+# data structure are 
 tail(db1,10)
 head(db1,10)
 # index of rows can give an idea how many rows data
 #structure contains
+
 
 #We can combine head and tail with View fucntion
 View( tail(db1,10)  )
@@ -63,15 +74,16 @@ View( tail(db1,10),title="Last_10_Observations"  )
 # another approach to 
 #visually inspect data onbect 
 #requires convergence of data to tibble
-as_tibble(db1)
+tibble::as_tibble(db1)
 # here under column name we have description of data type,
 # and first 10 records are displayed
 # as_tibble is alco used to convert object to 
-# tibble class. 
+# tibble class. This is not the fastest way and is
+# preferable whn you converge data frame to tibble
 
-# another approach requres yse of glimse fucntion from
+# another approach requres use of glimse fucntion from
 # tibble library
-glimpse(db1)
+tibble::glimpse(db1)
 
 # glimse easily allows to check sample records and data type.
 # in contrast to str(), glimpse displays 
@@ -98,7 +110,7 @@ summary(db1)
 # A very useful multipurpose function in R, summary(X), 
 # displays statistical properties of
 # ech column, for numeric data we get measure of spred
-#and central tendency, for categorical data 
+# and central tendency, for categorical data 
 # it is length, in other owrds number of records.
 # word mode is not the most commom character, it 
 # indicate that data is stored character type. 
@@ -111,13 +123,13 @@ summary(db1[, c("Manufacturer", "hp")])
 # or,  we might be interested in names
 #assigned to columns
 # Knowledge of column names hepls to correcly assign values
-# to varialbes, for example , ican forhet
-# is column nemas written in upper or lower case
+# to varialbes, for example , i can forget
+# if column nemas written in upper or lower case
 l_100_km<-with(db1, 282.5/MPG)
 names(db1)
 l_100_km<-with(db1, 282.5/mpg)
 #mpg is not hard to remeber, but for conviluted column names
-# it always good to check how exactly they are writen.
+# it always good to check how exactly they are named.
 
 
 # here is a common way to check indices of column which 
@@ -127,12 +139,13 @@ which( sapply(db1,typeof)=="character" )
 #each column of db1, next we use which to
 #convert values of TRUE in indices. 
 
-# now can extart the respective coluns
+# now we can extart the respective column using 
+#expression above
 db1[ ,which( sapply(db1,typeof)=="character" ) ]
 
 # to sum up, remeber and practice to use
 # str() ,  tail, head
-# View()
+# View() and
 # summary() functions to explore data before actual 
 # analysis. You need to know type of data to 
 # avoid errors related to situation when a function 
@@ -161,7 +174,6 @@ list.files()
 # to import files via loop
 
 
-
 # lets assume that out data is located in CSV file
 # common way is to use read.csv fucntion 
 # File I would upload occupied more than million rows
@@ -171,9 +183,9 @@ sample_1<-read.csv("1_in_sample.csv")
 Sys.time()-t1
 glimpse(sample_1)
 # our file had column names and by default read_csv
-# asumes that column naes exist
+# asumes that column names exist
 
-# common paramenters to define
+# common paramenters to remember
 # are header and stringsAsFactors
 sample_1<-read.csv("1_in_sample.csv",header = FALSE)
 glimpse(sample_1)
@@ -181,7 +193,7 @@ glimpse(sample_1)
 
 sample_1<-read.csv("1_in_sample.csv",header = TRUE,stringsAsFactors = TRUE)
 glimpse(sample_1)
-# factors are used to addign behavoit of numbers to characters
+# factors are used to add behaviour of numbers to characters
 # we will go back to factors later, but remember 
 # if data in initial file is organised in 
 # spreadshit form, where each column form a separate variable,
@@ -190,31 +202,37 @@ glimpse(sample_1)
 # one more work apect to remembet
 sample_1<-read.csv("1_in_sample.csv",header = TRUE)
 glimpse(sample_1)
-#Usually R is pretty god in distinguishing numbers from 
-# characters but for large files, it might conver all
-#records to characters
-sample_1<-read.csv("1_in_sample2.csv",header = TRUE)
+# Usually R is pretty god in distinguishing numbers from 
+# characters 
+
+# Unless colClasses parameter is specified,read.csv() imports
+# all columns as character and then converte it to
+# logical, integer, numeric, complex, characters or factors
+
+# what should we do if all record are worgly classified as
+#characters, to initiate this error we will  define 
+# column names, which are characters as
+# first row
+sample_1<-read.csv("1_in_sample.csv",header = FALSE)
 glimpse(sample_1)
 
-# Unless colClasses is specified,
-# all columns are read as character columns and then converted using
-# type.convert to logical, integer, numeric, complex
-# if all values are characters, read,csv fails to detect
-# approproate type
-
-# clearly some data are numbers but are imported as characters,
 #how to solve it:
 names(sample_1)
-sample_1<-read.csv("1_in_sample2.csv",header = TRUE,
-     colClasses=c('numeric','numeric','numeric','character','numeric',
-                  "character","character","character",
-                  'numeric','numeric','numeric') )
+# not the best , but still a solution,
+#we can use colClasses argument to specify 
+#type of each column
+sample_1<-read.csv("1_in_sample.csv",header = FALSE,
+                   colClasses=c('numeric','numeric','numeric','character','numeric',
+                                "character","character","character",
+                                'numeric','numeric','numeric') )
 glimpse(sample_1)
 # now is much better
+so remebner, read.csv with header,stringsasfactor and
+colclasses are very handy
 
 
 # There is better way both interms of speed and correct
-#data type coertion
+# data type coertion
 # lets check fucntion read_csv from readr
 # which demontrates faster perfomace fompate to read.csv
 t1<-Sys.time()
@@ -229,25 +247,25 @@ Sys.time()-t1
 # than base data frame. 
 
 sample_1<-readr::read_csv("1_in_sample.csv", col_names = FALSE)
- # as you can see , now actual column names form first record,
-# and therefore, al lcolumn are coerced to character type
-
+# as you can see , now actual column names form first record,
+# and therefore, all lcolumn are coerced to character type
+# so it you have and option use read_csv() as faster option
 
 # CSV is a good mean to transfer data, but 
 # how about excel file
 # How to read form xlsx or xls file:
-# we would require 
+# we would require read_excel() fucntion
 readxl::read_excel()
-# common arguments are sheet where we can specify
-#both name of sheet or its order
+# common arguments are "sheet" where we can specify
+# both name of sheet or its order
 
 # if you dont remember sheet names, we can use
 # quite usefull fucntion from readxl
 # library
 readxl::excel_sheets() 
 # it works even for sheets which are hided
-# therefore, if we forget file name and 
-# hwat sheet contains data , we can cobine
+# therefore, if we forget excel file name and 
+# what sheets it contains , we can cobine
 
 list.files()
 readxl::excel_sheets() 
@@ -274,13 +292,13 @@ vector_1[index_na]<-NA
 # In this case, must know fucntion 
 # whould be is.na() 
 
-is.na(vector_1) # false indicates that values is NA
+is.na(vector_1) # true indicates that values are NA
 loc<-which( is.na(vector_1) ) # we identify indices of na values
 vector_1[ loc ]<-mean(vector_1,na.rm = TRUE) 
 # here we replcae values of indices in loc with 
-# mean values of vecor, which is contast for all missing values
+# mean value of vector, excluding NA values
 
-# it can also me dediab of data
+# we can also use dedian for data
 vector_1[index_na]<-NA
 vector_1[ loc ]<-median(vector_1,na.rm = TRUE) 
 
@@ -291,6 +309,17 @@ na.omit(vector_1) # to prop NA values
 # by converting  vector_1 to numeric type
 as.numeric(na.omit(vector_1))
 
+# another method, is to use 
+dplyr::coalesce() fcuntion ,
+# now its main purpose is different from replacing NA , but
+# it can be easily applied and NA replacing tool
+
+dplyr::coalesce(vector_1,300)
+# i use 300  to highligh taht we actually repaced mussing values 
+# with number we definced
+# we can also use expession which resuti in single value
+coalesce(vector_1,mean(vector_1,na.rm = TRUE) )
+
 
 # What about 2 dimentional structures like data frames or tibble
 # first of all, 2 dimentions measn we need to know both
@@ -299,43 +328,71 @@ as.numeric(na.omit(vector_1))
 # vector , therefore, lets start with 
 # methods which save typing time
 
-DF <- data.frame(x = c(NA, 2, 3), y = c(0, 10, NA))
+DF <- data.frame(x = c(1,1,NA,3,NA,8,13), y = c(NA,7,1,8,2,NA,1))
+#our sample data freamne contains NA values, 
+# now lets define wats to remove rows which contain NA
+# first off all na.omit
 na.omit(DF)
+#Evan if only 1 column contain NA, row would be omitted
 
 # to iplement positiona indexing we would requre 
 # use of apply function to check presence of NA in a row
 apply(DF, MARGIN=1, is.na)
 # here logical vector is obtained
+# 2 lines for each column , value of TRUE indoicates NA
+# to check if na is present in aby row we add any function
+
 apply(DF, MARGIN=1, function(x) !(any(is.na(x))) )
+#with exp mark true indicates what values are not NA
+
 # here are rows which contain at leat one na value
 DF[apply(DF, MARGIN=1, function(x) !(any(is.na(x))) ),]
 
 # solution to remove na are abunded , here is the option 
-# to remove fact thant TRUE is 1 and FALSE is 0
+# to remove given fact thant TRUE is 1 and FALSE is 0
 rowSums( is.na(DF) )==0
 DF[rowSums( is.na(DF) )==0,]
 
 
 # removing rows with missing data is challenge, but not a big one,
-# beter solution , epscecially only 1 row contains missing data,
-# is to  replace missing data
+# beter solution , 
+# is to replace missing data with most expected value
 # lets start with solution offered by 
 #R libraries
 
-# we can also call for fucntions for tibble
+# the most common and popular is replace_na
+# for vector we specify vector name, and what value to use
+# to replace na values, vary silimat to use of
+# coalunse fucntion
 replace_na(vector_1,mean(vector_1,na.rm = TRUE))
 
-# how replace na should work with tibble or data frames:
+#  For tibble or dataframes, we can specify method to 
+# replace na unique for each column
 
-DF <- data.frame(x = c(NA, 2, 3), y = c(15, 10, NA))
-replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),y=mean(DF$y,na.rm = TRUE) ) )
-DF <- data.frame(x = c(NA, 2, 3,5,6), y = c(15, 10, NA,32,34),z=c("a",NA,"a","c","b"))
+DF <- data.frame(x = c(1,1,NA,3,NA,8,13), y = c(NA,7,1,8,2,NA,1))
+replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),y=median(DF$y,na.rm = TRUE) ) )
+# values in column x are replaced with mean ,
+#values in column y are replaced with median
+# note than we specify a pair column and replacement value as
+# paramenets in list fcuntion
+
+DF <- data.frame(x = c(1,1,NA,3,NA,8,13), y = c(NA,7,1,8,2,NA,1),
+                 e=c("a","b",NA,"d","a",NA,"a"))
+
 replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),y=mean(DF$y,na.rm = TRUE),
                     z=mean(DF$z,na.rm = TRUE)) )
-# this is example where summary fucntion woul dbe helpfull
+# this is example where summary fucntion would  be helpfull
+# to select appropriate method to replace NA
+summary(DF)
+
+# now we know that column z contain characters and
+# we cant use neiter mean or median for imputaion
+# lets try to replace missing character withe hte most 
+#freauent character in column
+
 replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),y=mean(DF$y,na.rm = TRUE),
                     z=mode(DF$z)) )
-
+# this is not waht we require
 # R does not have a standard in-built function to calculate mode.
 # So we create a user function to calculate mode of a data set in R.
 
