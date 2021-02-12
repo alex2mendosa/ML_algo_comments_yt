@@ -1,5 +1,6 @@
 library(tibble)
 library(dplyr)
+setwd("C:/Users/UACecetoAl/Desktop/R_Input/2_ML_Course")
 n<-10^6
 sku_list<-c("Product_A","Product_B","Product_C","Product_D","Product_E")
 sample_1<-tibble(
@@ -25,9 +26,6 @@ write.table(sample_1,"2_sample.txt",row.names = FALSE,sep="\t")
 write.table(sample_1,"3_sample.txt",row.names = FALSE,sep="/")
 
 
-read.table("1_sample.txt",nrows=10,sep=",",header=TRUE)
-read.table("2_sample.txt",nrows=10,sep="\t",header=TRUE)
-read.table("3_sample.txt",nrows=10,sep="/",header=TRUE)
 
 
 #   we would require 5 libraries to 
@@ -38,18 +36,19 @@ library(tidyr)
 library(readr)
 library(readxl)
 
- 
-                           ### 1 Dataset description
+
+### 1 Dataset description
 
 # lets create dataset and experiment over it.
 # dataset would be based on mtcars dataset
 
-db1<-as.data.frame(mtcars,rownames = NA)
+db1<-as.data.frame(datasets::mtcars,rownames = NA)
 db1<-rownames_to_column(db1,var="Model")
 db1["Manufacturer"]<-sapply(strsplit(db1$Model," "),function(x) x[[1]]) 
 db1<-select(db1,Manufacturer, 1:5)
 # Here I modify mtcars data set by adding 2 columns
 # and leaving 6 columns in total
+#mtcars by itself is avaibalbe in r base library
 
 # Analysis always start with exploration of 
 # data object, how many columns, row it contains, 
@@ -75,8 +74,8 @@ str(db1)
 # Function allows quick preview of the 
 # contents and structure. 
 
-#We can also use View() function to fully, explicityly check 
-#all records in data structure, similar to spreadsheet-style
+# We can also use View() function to fully, explicityly check 
+# all records in data structure, similar to spreadsheet-style
 View(db1)
 # Data is converiently displayed in separate window
 # window name inherits name of argument
@@ -220,53 +219,60 @@ select(db1, where( is.character )  )
 #! The working directory is  file 
 #! path  that sets the default location 
 #! of any files you read into or save out of R.
-# in other words, if file is located in 
+# Main point is: if file is located in 
 # workign category we can read data from it 
-# only using its name as argument for read function
+# only using its name as argument
+#No need to specify full path
 
 # lets check our workign directiry
 getwd()
 setwd()
 setwd("C:/Users/UACecetoAl/Desktop/R_Input/2_ML_Course")
+getwd()
 # another funtion is extremely isefull
 # to check what files are located in directory
 list.files()
 # fucntion serves well
 # to check correct name of file, extension or 
-# to import files via loop
+# to import files via loop, or just copy file name
 
 # lets assume that out data is located in CSV file
 # in our working directory
-# common way is to use read.csv fucntion 
-# File I would upload occupies  almost million rows ,weights apr 100mb, 
+# common way is to use read.csv function
+# File I would upload occupies  almost 
+# million rows ,weights apr 100mb, 
+# I am russin speaker and I refer as 
+# file weight not file size
 # lets check how fast it would be uploaded
 t1<-Sys.time()
-sample_1<-read.csv("1_in_sample.csv")
+sample_1<-read.csv("1_sample.csv") # make error
 Sys.time()-t1
 glimpse(sample_1)
 # data in our file has column names and by default read.csv
-# asumes that column names exist , also R autimatically detects
+# assumes that column names are first row
+# of uploaded file, also R autimatically detects
 # type of data in each column
 
+
 # here is example where we specify absolute file path
-sample_1<-read.csv("C:/Users/UACecetoAl/Desktop/R_Input/2_ML_Course/1_in_sample.csv")
+sample_1<-read.csv("C:/Users/UACecetoAl/Desktop/R_Input/2_ML_Course/1_sample.csv")
 glimpse(sample_1)
-# Output is the same because 1_in_sample.csv is located in 
-# working directory
+# Output is the same because file is located in 
+# working directory and we dont need to specify absolute path
 
 
 # common paramenters to remember when working with 
 # read.csv are
 # header and stringsAsFactors
-sample_1<-read.csv("1_in_sample.csv",header = FALSE)
-# as I said before, if header parameter is not cpecified
+sample_1<-read.csv("1_sample.csv",header = FALSE)
+# as I said before, if header parameter is not specified
 # r assumes that heades is True
 glimpse(sample_1)
 # R automacally assigned unique column names
 # notice that now all column are of character type
 
 # how about stringsAsFactors argument
-sample_1<-read.csv("1_in_sample.csv",header = TRUE,stringsAsFactors = TRUE)
+sample_1<-read.csv("1_sample.csv",header = TRUE,stringsAsFactors = TRUE)
 glimpse(sample_1)
 # factors are used to add behaviour of numbers to characters
 # we will go back to factors later, but remember 
@@ -275,7 +281,7 @@ glimpse(sample_1)
 # read.csv should perform very well.
 
 # one more work apect to remembet
-sample_1<-read.csv("1_in_sample.csv",header = TRUE)
+sample_1<-read.csv("1_sample.csv",header = TRUE)
 glimpse(sample_1)
 # R is pretty god in distinguishing numbers from 
 # characters 
@@ -290,7 +296,7 @@ glimpse(sample_1)
 # characters, to initiate this error we will
 # make column names, which are characters,  as first row value
 
-sample_1<-read.csv("1_in_sample.csv",header = FALSE)
+sample_1<-read.csv("1_sample.csv",header = FALSE)
 glimpse(sample_1)
 
 #Now all are characters
@@ -299,7 +305,7 @@ dim(sample_1)
 # not the best , but still a solution,
 # we can use colClasses argument to specify 
 # type of each column
-sample_1<-read.csv("1_in_sample.csv",header = FALSE,
+sample_1<-read.csv("1_sample.csv",header = FALSE,
                    colClasses=c('numeric','numeric','numeric','character','numeric',
                                 "character","character","character",
                                 'numeric','numeric','numeric') )
@@ -317,7 +323,7 @@ glimpse(sample_1)
 # lets check fucntion read_csv from readr
 # which demontrates faster perfomace fompate to read.csv
 t1<-Sys.time()
-sample_1<-readr::read_csv("1_in_sample.csv")
+sample_1<-readr::read_csv("1_sample.csv")
 Sys.time()-t1
 # first notice that read_csv shows what type of data 
 # was chosen for each column 
@@ -332,7 +338,7 @@ Sys.time()-t1
 
 
 #first of all col_names
-sample_1<-readr::read_csv("1_in_sample.csv", col_names = FALSE)
+sample_1<-readr::read_csv("1_sample.csv", col_names = FALSE)
 # as you can see , now actual column names form first record,
 # and therefore, all columns are coerced to character type
 # Overall, if 
@@ -346,26 +352,71 @@ readxl::read_excel()
 # common arguments are "sheet" where we can specify
 # both name of sheet or its order
 
+sample_1<-readxl::read_excel("1_sample.xlsx", col_names = TRUE)
+# we get empty tibble, because by defaul read_excel imports data 
+# from first sheet of excel, but the data we wanr in stored in 
+#second list
+
+
 # if you dont remember sheet names, we can use
 # quite usefull fucntion from readxl
 # library
 readxl::excel_sheets() 
+readxl::excel_sheets("1_sample.xlsx") 
 # it works even for sheets which are hided
 # therefore, if we forget excel file name and 
 # what sheets it contains , we can cobine
 
 list.files()
-readxl::excel_sheets() 
+readxl::excel_sheets("1_sample.xlsx") 
+
+# end now we can read data from 
+sample_1<-readxl::read_excel("1_sample.xlsx", sheet=2,col_names = TRUE)
+
+
+t1<-Sys.time()
+sample_1<-readxl::read_excel("1_sample.xlsx", sheet="1_sample",col_names = TRUE)
+Sys.time()-t1 
+
+#if you playing music it can take even more time
+# definately it takes so times, we can speed up it a little bit by
+# adjustin guess_max argument
+
+t1<-Sys.time()
+sample_1<-readxl::read_excel("1_sample.xlsx", sheet="1_sample",col_names = TRUE,guess_max=10)
+Sys.time()-t1
+
+# Now as final part relates to data upload practice
+# lest check how to deal with data sored as text
+# here our weapon of choince is read.table fcuntion
+
+# how to read data where column values are separated with comma,
+# well , we adjust sep argument
+read.table("1_sample.txt",nrows=10,sep=",",header=TRUE)
+
+# how to read data where column values are separated with comma,
+# well , we adjust sep argument , specifying tab
+read.table("2_sample.txt",nrows=10,sep="\t",header=TRUE)
+
+# and finally, here is how to upload data separated by dash
+read.table("3_sample.txt",nrows=10,sep="/",header=TRUE)
+
+
 
 # overall, 3 fucnton are good to remember,
 # getwd()
 # setwd()
 # list.file()
 # read_csv() or read.csv()
-# read.xlsx for excel files.
+# read.xlsx for excel files and
+# finally read.table
+
+ 
 
 
-# 3 Taking care of Missing Data
+
+
+                   # 3 Taking care of Missing Data
 
 #lets create sample vector with  NA Values
 vector_1<-sample( c(rnorm(5,10,2)), 10, replace = TRUE)
