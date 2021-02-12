@@ -1,3 +1,32 @@
+library(tibble)
+library(dplyr)
+n<-10^6
+sku_list<-c("Product_A","Product_B","Product_C","Product_D","Product_E")
+sample_1<-tibble(
+  Date_Full=sample( seq(as.Date("2020/1/1"), by = "month", length.out = 12),n,replace=TRUE),
+  Yr_Or=format(Date_Full,format="%Y"),
+  Mon_Name=format(Date_Full,format="%b"),
+  Week=format(Date_Full,format="%U"),
+  Sales=sample(500:1000,n,replace=TRUE),
+  Investment=sample(100:300,n,replace=TRUE), 
+  SKU=sample(sku_list,n,replace=TRUE) ,
+  SKU_Type=sample( c("Promo_Bundle","Standard","Discounted"),n,replace=TRUE ),
+  Business=sample( c("Meat_Poultry","Beverage","Dairy","Spices","Waters"),n,replace=TRUE   ),
+  Freshness=sample( c("1+","2+","3+"),n,replace=TRUE )  ,
+  Country=sample( c("Russia","Romania","Rwanda"),n,replace=TRUE ),
+  CEO=sample(c("Mikael Greaves","Nadeem Long","Shyla Short","Preston Wilkins",
+               "Conal Carter","Elliott Irwin","Amman Henson"),n,replace = TRUE),
+  Tax_rate=sample(seq(0.05,0.3,0.01),n,replace=TRUE),
+  Customer=sample(c("KADI","AAckRi","NamToc","Daram","Garme"),n,replace=TRUE))
+
+write.csv(sample_1,"1_sample.csv",row.names = FALSE)
+write.table(sample_1,"1_sample.txt",row.names = FALSE,sep=",")
+write.table(sample_1,"2_sample.txt",row.names = FALSE,sep="\t")
+write.table(sample_1,"3_sample.txt",row.names = FALSE,sep="/")
+
+
+
+
 #   we would require 5 libraries to 
 #   exolore potential and options of data preprocessing in R
 library(dplyr)
@@ -195,7 +224,7 @@ select(db1, where( is.character )  )
 # lets check our workign directiry
 getwd()
 setwd()
-
+setwd("C:/Users/UACecetoAl/Desktop/R_Input/2_ML_Course")
 # another funtion is extremely isefull
 # to check what files are located in directory
 list.files()
@@ -206,7 +235,7 @@ list.files()
 # lets assume that out data is located in CSV file
 # in our working directory
 # common way is to use read.csv fucntion 
-# File I would upload occupies  almost million rows 
+# File I would upload occupies  almost million rows ,weights apr 100mb, 
 # lets check how fast it would be uploaded
 t1<-Sys.time()
 sample_1<-read.csv("1_in_sample.csv")
@@ -217,7 +246,7 @@ glimpse(sample_1)
 # type of data in each column
 
 # here is example where we specify absolute file path
-sample_1<-read.csv("C:/Users/UACecetoAl/Desktop/R_Input/1_in_sample.csv")
+sample_1<-read.csv("C:/Users/UACecetoAl/Desktop/R_Input/2_ML_Course/1_in_sample.csv")
 glimpse(sample_1)
 # Output is the same because 1_in_sample.csv is located in 
 # working directory
