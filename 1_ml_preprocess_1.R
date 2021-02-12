@@ -25,6 +25,9 @@ write.table(sample_1,"2_sample.txt",row.names = FALSE,sep="\t")
 write.table(sample_1,"3_sample.txt",row.names = FALSE,sep="/")
 
 
+read.table("1_sample.txt",nrows=10,sep=",",header=TRUE)
+read.table("2_sample.txt",nrows=10,sep="\t",header=TRUE)
+read.table("3_sample.txt",nrows=10,sep="/",header=TRUE)
 
 
 #   we would require 5 libraries to 
