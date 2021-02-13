@@ -463,165 +463,298 @@ read.table("3_sample.txt",sep="/",header=TRUE)
 
 
             # 3 Taking care of Missing Data
+# Missind data are records or elements which have 
+# indices or location ib data object but bring no
+# information beneficial information about the data object
+# or interaction between varriables
 
 #lets create sample vector with  NA Values
-vector_1<-sample( c(rnorm(5,10,2)), 10, replace = TRUE)
-index_na<-sample( 1:10,3,replace=FALSE )
-vector_1[index_na]<-NA
+vector_1<-c(4.5,4.6,4.7,NA,4.8,4.9,NA,5,9.7,9.8,9.9,NA,10,9.1)
+#again fill free to replicate any piece of code
 
-# we need to replace NA values, 2
-# approaches can be used
+
+# we need to replace NA values in 1 dimetional object
+# 2 # approaches can be used
 # first approach is to identify indices[location]
 # of values which are equal NA
 # In this case, must know fucntion 
-# whould be is.na() 
+# whould be is.na() and which()
 
 is.na(vector_1) # true indicates that values are NA
 loc<-which( is.na(vector_1) ) # we identify indices of na values
 vector_1[ loc ]<-mean(vector_1,na.rm = TRUE) 
-# here we replcae values of indices in loc with 
+# here we replcae values with indices in loc with 
 # mean value of vector, excluding NA values
 
-# we can also use dedian for data
-vector_1[index_na]<-NA
+# we can also use median for data
+vector_1[loc]<-NA
 vector_1[ loc ]<-median(vector_1,na.rm = TRUE) 
 
-# besides indeing we can use r base fucntions
-# 2 common approaches are
+# we can difene fucntion which allows to select 
+#median or mean as option to repace na
+
+f_na_rep<-function(x,option) {
+  loc<-which( is.na(x) )
+    if (option==1) {
+      x[ loc ]<-mean(x,na.rm = TRUE) 
+    } else { x[ loc ]<-median(x,na.rm = TRUE)  }
+  return(x)  }
+
+# here we use option parameter to choose between
+# mean or median
+# for mean we have
+vector_1[loc]<-NA
+f_na_rep(vector_1,option=1) 
+# for median we can use 2
+f_na_rep(vector_1,option=2)
+
+
+
+# Second approach , besides logical and positiona
+# indexing or used define fucntions,
+# is that we  can use r fucntion.
+#  common approachs is
 na.omit(vector_1) # to prop NA values
 # if you are discourage with atribures list,  we can remove it 
 # by converting  vector_1 to numeric type
 as.numeric(na.omit(vector_1))
 
-# another method, is to use 
-dplyr::coalesce() fcuntion ,
+# another method, is to use coalesce fucntion
+dplyr::coalesce() 
 # now its main purpose is different from replacing NA , but
-# it can be easily applied and NA replacing tool
+# it can be easily applied as NA replacing tool
 
 dplyr::coalesce(vector_1,300)
-# i use 300  to highligh taht we actually repaced mussing values 
+# i use 300  to highligh that we actually repaced mussing values 
 # with number we definced
-# we can also use expession which resuti in single value
-coalesce(vector_1,mean(vector_1,na.rm = TRUE) )
+# we can also use expession which results in single value
+dplyr::coalesce(vector_1, mean(vector_1,na.rm = TRUE) )
 
 
-# What about 2 dimentional structures like data frames or tibble
+# What about 2 dimentional structures like data frames or tibbles
 # first of all, 2 dimentions measn we need to know both
 # row and column index of NA values, 
 # which would be more computationally expensive compare to 
-# vector , therefore, lets start with 
-# methods which save typing time
+# vector , therefore, we should avoid indexing via 
+# standard nested loop with i and j
 
-DF <- data.frame(x = c(1,1,NA,3,NA,8,13), y = c(NA,7,1,8,2,NA,1))
-#our sample data freamne contains NA values, 
-# now lets define wats to remove rows which contain NA
+for (i in 1:nrow(DF) ) {
+  for (i in 1:ncol(DF) ) {
+    
+  }
+}
+
+# lets create sample data frame
+DF <- data.frame(x = rnorm(50,10,1), 
+                 y = rnorm(50,5,1),
+                 z =rnorm(50,1,1))
+
+# now lets assign 10 na values per each column
+
+DF[ sample(1:50,10,replace=FALSE),1 ]<-NA
+DF[ sample(1:50,10,replace=FALSE),2 ]<-NA
+DF[ sample(1:50,10,replace=FALSE),3 ]<-NA
+
+# lets have a look if each column contain NA
+View(DF)
+#Greate job
+
+
+# how about not the most efficient idea to replace NA
+#lets try nested loop
+colMeans(DF,na.rm = TRUE)
+# here are hooe mean we would like to impute instead of NA values
+#lets store them in vector
+
+col_means<-colMeans(DF,na.rm = TRUE)
+# now we dont need to calsulate them each time we
+# find Na values
+# finally the loop
+DF_2<-DF
+for (i in 1:nrow(DF_2) ) {
+  for (j in 1:ncol(DF_2) ) {
+      if ( is.na(DF_2[i,j]) ) {
+        DF_2[i,j]<-col_means[j] } 
+  }
+}
+# Perfomance of the respective loop would depende on 
+# number of rows , moreover , it might be that for 
+# each column we have unique approach in replacing NA
+# values, therefore, lets deop solution via loops and
+# consider another options
+
+
+# Now, regarding DF,  we would lile to remove all rows
+# which contain at leas 1 NA
 # first off all na.omit
 na.omit(DF)
-#Evan if only 1 column contain NA, row would be omitted
+#Even if only 1 column contain NA, row would be omitted
 
-# to iplement positiona indexing we would requre 
+# to implement positiona indexing we would requre 
 # use of apply function to check presence of NA in a row
 apply(DF, MARGIN=1, is.na)
-# here logical vector is obtained
-# 2 lines for each column , value of TRUE indoicates NA
-# to check if na is present in aby row we add any function
+# here logical vector is obtained per each column
+# value of TRUE indicates NA for column row
 
-apply(DF, MARGIN=1, function(x) !(any(is.na(x))) )
-#with exp mark true indicates what values are not NA
+apply(DF, MARGIN=1, function(x) any(is.na(x)) )
+#Next we apply is.na(x) per each row, any()
+# givex single True if row contains NA
+# Therefore, we have 50 values, TRUE indcates that 
+#row contain NA
 
 # here are rows which contain at leat one na value
-DF[apply(DF, MARGIN=1, function(x) !(any(is.na(x))) ),]
+DF[apply(DF, MARGIN=1, function(x) any(is.na(x))) ,]
+# we can add exclamation mark to negate logical values
+# to check all rows without NA
+DF[!(apply(DF, MARGIN=1, function(x) any(is.na(x)))) ,]
 
-# solution to remove na are abunded , here is the option 
+# solution to remove na are abubdant , here is the option 
 # to remove given fact thant TRUE is 1 and FALSE is 0
-rowSums( is.na(DF) )==0
-DF[rowSums( is.na(DF) )==0,]
+rowSums( is.na(DF) )==0 # We sum ligical values per row, 
+DF[rowSums( is.na(DF) )==0,] # and apply logical indexing
+
+# Definatly, if you dont need to practice use of apply
+#fucntion, condidet to use na.omit
+
+# Now one more example or usefull R fucntion to detect na
+complete.cases()
+#Return a logical vector indicating which rows are complete
+# i.e., have no missing values
+
+complete.cases(DF) # now again we can use logical indexing
+DF[complete.cases(DF),]
+# or count how many rows have missing data
+sum(!complete.cases(DF))
+# we combine exclamation and sum fcuntion
 
 
-# removing rows with missing data is challenge, but not a big one,
-# beter solution , 
+# removing rows with missing data is challenge, but not a 
+# big one, If have have 10 value in signle row and only 1 column
+# contains NA and we drop the row, we also remove factual data
+# from the ramainig 9 columns.  Beter solution , 
 # is to replace missing data with most expected value
 # lets start with solution offered by 
-#R libraries
+# R libraries
 
-# the most common and popular is replace_na
+# the most common and popular is replace_na fucntion
 # for vector we specify vector name, and what value to use
 # to replace na values, vary silimat to use of
-# coalunse fucntion
-replace_na(vector_1,mean(vector_1,na.rm = TRUE))
+# coalece fucntion
+
+tidyr::replace_na(vector_1,mean(vector_1,na.rm = TRUE))
+tidyr::replace_na(vector_1, 300)
 
 #  For tibble or dataframes, we can specify method to 
-# replace na unique for each column
+#  replace na values with value specific for each column
 
-DF <- data.frame(x = c(1,1,NA,3,NA,8,13), y = c(NA,7,1,8,2,NA,1))
-replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),y=median(DF$y,na.rm = TRUE) ) )
+tidyr::replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),
+                    y=median(DF$y,na.rm = TRUE)
+                    z=IQR(DF$z,na.rm = TRUE)) 
+                   )
 # values in column x are replaced with mean ,
-#values in column y are replaced with median
-# note than we specify a pair column and replacement value as
-# paramenets in list fcuntion
+# values in column y are replaced with median,
+#values in z are replaced with IQR
+# note than we specify  pairs as list: column and replacement value 
 
-DF <- data.frame(x = c(1,1,NA,3,NA,8,13), y = c(NA,7,1,8,2,NA,1),
-                 e=c("a","b",NA,"d","a",NA,"a"))
+# Lest add column with characters to DF
+DF["d"] <- sample(letters,50,replace = TRUE)
+View(DF)
+DF[ sample(1:50,10,replace=FALSE),4 ]<-NA
 
-replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),y=mean(DF$y,na.rm = TRUE),
-                    z=mean(DF$z,na.rm = TRUE)) )
+tidyr::replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),
+                    y=median(DF$y,na.rm = TRUE),
+                    z=IQR(DF$z,na.rm = TRUE),
+                    d=mean(DF$d,na.rm = TRUE)) )
+# we encounter an error
 # this is example where summary fucntion would  be helpfull
 # to select appropriate method to replace NA
 summary(DF)
 
-# now we know that column z contain characters and
-# we cant use neiter mean or median for imputaion
-# lets try to replace missing character withe hte most 
-#freauent character in column
+# now we know that column d contain characters and
+# we cant use neiter mean or median for imputation
+# lets try to replace missing character with the most 
+#frequent  letter in column
 
-replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),y=mean(DF$y,na.rm = TRUE),
-                    z=mode(DF$z)) )
-# this is not waht we require
-# R does not have a standard in-built function to calculate mode.
-# So we create a user function to calculate mode of a data set in R.
+tidyr::replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),
+                           y=median(DF$y,na.rm = TRUE),
+                           z=IQR(DF$z,na.rm = TRUE),
+                           d=mode(DF$d,na.rm = TRUE)) )
 
-mode_z<-names( which.max(table(DF$z)) )
+# this is not what we require
+# R does not have a standard in-built function
+# to calculate mode.
+# So we create a user function function
+# to calculate mode of a data set in R.
 
-replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),y=mean(DF$y,na.rm = TRUE),
-                    z=mode_z) )
+mode_z<-names( which.max( table(DF$d) ) )
+# table counts letters
+# which.max find indices of most frequent value 
+# and we extract name
 
-# I cant agree that any approach is codint can be classofied as
-# abused, but sometimes its good to leave for a while 
-# routine and try another solution, repalce_na is greate but lets have a look on another
-# oprion
+# now lets imput values for each column
+tidyr::replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),
+                           y=median(DF$y,na.rm = TRUE),
+                           z=IQR(DF$z,na.rm = TRUE),
+                           d=mode_z) )
 
-# first of all if_else
+# repalce_na is greate and I ecourage to use
+# it as greate and efficient time saver,
+# but lets have a look on another
+# option
+
+# lets check ifelse optio
 
 ifelse( is.na(DF$x),mean(DF$x,na.rm = TRUE),DF$x) # or
-if_else( is.na(DF$x),mean(DF$x,na.rm = TRUE),DF$x) 
+dplyr::if_else( is.na(DF$x),mean(DF$x,na.rm = TRUE),DF$x) 
+# we read it as, if any value in column x is NA, we replace it
+#otherwise kep it unchanged
 
 # now to avoid typind doller accessor eact time , we can use
 # with to create envirinment
 
 with(DF, if_else( is.na(x),mean(x,na.rm = TRUE),x)  )
+#result is the same
 
-# so far , if dealing with 2 dim object, i recommend to stich to 
-# replace na, other wise you will require to make 
-# user define function combined with apply family function
+# so far , if dealing with 2 dim object,
+# i recommend to employ  
+# replace_na
+# Remember , ieven if for some reason library 
+# is not available or you dont want to abuse
+# partuclar method, you can always define your own fucntion
 
-# here the solution to the end of chapter
+# here is the fucntion which replace na if
+# with mean if column is of numeric type
+#or with mode of column is character
+
+DF3<-tidyr::replace_na(DF,list( x=mean(DF$x,na.rm = TRUE),
+                                y=mean(DF$y,na.rm = TRUE),
+                                z=mean(DF$z,na.rm = TRUE),
+                                d=mode_z) )
+
 
 rep_na<- function(x) {
+  loc<-which(is.na(x))
   if ( is.character(x)  ) {
     mode_z<-names( which.max(table(x)) )
-    loc<-which(is.na(x))
     x[loc]<-mode_z
     return(x)
   }  else {
-    loc<-which(is.na(x))
     x[loc]<-mean(x,na.rm = TRUE)
     return(x)
   }  
 }
 
 
-sapply( DF, rep_na )
+as.data.frame( lapply( DF,  rep_na ) ) 
 
 
+# Greate job, in R we can approach 
+# challenge with NA bith via User define fucntions
+# which usually involve aplication of
+# is.na, which and apply family of fucntion
+
+# R also offers great solutions with 
+# ducntions like complete.cases,
+# replace_na
 
 
