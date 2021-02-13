@@ -1,6 +1,8 @@
 library(tibble)
 library(dplyr)
 setwd("C:/Users/UACecetoAl/Desktop/R_Input/2_ML_Course")
+
+# Create sample data objects
 n<-10^6
 sku_list<-c("Product_A","Product_B","Product_C","Product_D","Product_E")
 sample_1<-tibble(
@@ -30,12 +32,30 @@ write.table(sample_1,"3_sample.txt",row.names = FALSE,sep="/")
 
 #   we would require 5 libraries to 
 #   exolore potential and options of data preprocessing in R
-library(dplyr)
+library(dplyr) 
 library(tibble)
 library(tidyr)
 library(readr)
 library(readxl)
 
+# As soon as you installed respecitve libraries , you can 
+# call fucntion from  library in 2 ways
+# 1-st  by indicating both library name and fucntion via double colon
+dplyr::select()
+
+#or just fucntion name
+select()
+
+# we will use first approach, so you can judje
+# by yourself  how important library is to 
+# data processing challenges
+
+# notice that the same fucntion can be a part of different libraries
+# like select
+
+select # f1 , it is part of MASS and dplyr libraries, therefore,
+# to avoid mistakes , in some cases it is necessary to specify what
+# library functuin belongs to 
 
 ### 1 Dataset description
 
@@ -43,12 +63,12 @@ library(readxl)
 # dataset would be based on mtcars dataset
 
 db1<-as.data.frame(datasets::mtcars,rownames = NA)
-db1<-rownames_to_column(db1,var="Model")
+db1<-tibble::rownames_to_column(db1,var="Model")
 db1["Manufacturer"]<-sapply(strsplit(db1$Model," "),function(x) x[[1]]) 
-db1<-select(db1,Manufacturer, 1:5)
+db1<-dplyr::select(db1,Manufacturer, 1:5)
 # Here I modify mtcars data set by adding 2 columns
 # and leaving 6 columns in total
-#mtcars by itself is avaibalbe in r base library
+# mtcars by itself is avaibalbe in r base library: datasets
 
 # Analysis always start with exploration of 
 # data object, how many columns, row it contains, 
@@ -65,7 +85,7 @@ str(db1)
 # number of columns referred as variables
 # name of each column,
 # after "colon",  type of data is indicated,
-# next we can check sample of data each column contains
+# next we can check sample of data each column contains,
 # usually the respective function is not accompanied
 # with additional arguments
 
@@ -84,8 +104,23 @@ View(db1)
 dim(db1) 
 #we get number of rows and columns
 # Dimention are requred usually when 
-#designing a loop around data frame or debugging in 
-#case you want to row or col bind multiple objects
+# designing a loop around data frame or debugging in 
+# case you want to row or col bind multiple objects
+
+# to check size of object, we can use 
+object.size()
+object.size(db1)  # for me it ies more convernietn to work with
+                  # Kb, lets check documentation of fucntion
+object.size  #f1
+
+# We see paramaeter units which accepts argument "Kb",
+# but it is not part of object.size functiuon , it
+# should be parameter of pring fucntion
+print( object.size(db1),units="Kb" ) 
+
+# greate job, remember that work with fucntion documentation
+# is very importat for optimal parameters tuning and general
+# understanding how to define arguments for parameters
 
 
 # another  2 sommon methods are used to check
@@ -103,7 +138,7 @@ View( head(db1,10)  )
 # View usually is used withou additional
 #arguments, however we can supply title 
 #parameter to make window name more informative
-View( tail(db1,10),title="Last_10_Observations"  )
+View( tail(db1,10), title="Last_10_Observations"  )
 
 # another approach requres use of glimse fucntion from
 # tibble library
@@ -120,16 +155,16 @@ tibble::glimpse(db1)
 
 
 # another approach to 
-#visually inspect data onbect 
-#requires convergence of data to tibble
+# visually inspect data onbect 
+# requires convergence of data to tibble
 # with as_tibble fcuntion 
 tibble::as_tibble(db1)
 # here under column name we have description of data type,
-# and first 10 records are displayed
-# as_tibble is mainly used to convert object to 
-# tibble class and this is how
+# and first 10 records are displayed.
+# as_tibble is mainly used to convert object like data frame
+# to  tibble class and this is how
 # you should use it,
-# so its better yo use str or View fucntuon()
+# so its better yo use str or View function()
 
 
 
@@ -157,7 +192,7 @@ summary(db1)
 # it is length, in other owrds number of records.
 # word mode is not the most commom character, it 
 # indicates that data is stored as character type. 
-# cosider its similar to type of data.
+# cosider it being similar to type of data.
 
 #fucntion summary can be applied to specific columns
 summary(db1[, c("Manufacturer", "hp")])
@@ -170,7 +205,7 @@ summary(db1[, c("Manufacturer", "hp")])
 # if column name written in upper or lower case
 l_100_km<-with(db1, 282.5/MPG)
 names(db1)
-l_100_km<-with(db1, 282.5/mpg)
+l_100_km<-with(db1, 282.5/MPG)
 # mpg is not hard to remeber, but for conviluted column names
 # it always good to check how exactly they are written
 
@@ -184,29 +219,34 @@ which( sapply(db1,typeof)=="character" )
 # convert values of TRUE in indices. 
 
 # now we can extart the respective column using 
-#expression above
+# expression above
 db1[ ,which( sapply(db1,typeof)=="character" ) ]
 
 
-# if we canre about being in from most recent 
-# coding practices , we can use elect fucntion 
+# if we care about being inline most contemporary and 
+# most efficient 
+# coding practices , we can use select fucntion 
 # fron dplyr
-select(db1, where( is.character )  )
+dplyr::select(db1, where( is.character )  )
 # where is funtion inside select which is used to 
 # specify condition to select column
 
-# Characters requres specific approach in machine learning
-# therefor it is nice to know expression which hepr to
-# explore specifically columns differenct from numbers
+# Greate Job
+
+# Characters or categorical data
+# requres specific treatment in machine learning
+# therefore, it is good to know expression which help to
+# explore specifically columns with categorical data
 
 
 # to sum up, remeber and practice to use
-# str() ,  tail, head
+# str() ,  tail(), head()
 # View() and
-# summary() functions to explore data before actual 
+# summary(). The respective functions 
+#  assist in exploring data before actual 
 # analysis. You need to know type of data to 
 # avoid errors related to situation when a function 
-# is applied to an object of of a type not suited for respective
+# is applied to an object of type not suited for respective
 # function, also, we need to know dimention 
 # and name of columns to
 # correctly define data transformation workflow
@@ -220,45 +260,55 @@ select(db1, where( is.character )  )
 #! path  that sets the default location 
 #! of any files you read into or save out of R.
 # Main point is: if file is located in 
-# workign category we can read data from it 
-# only using its name as argument
-#No need to specify full path
+# workign directiry, we can read data from it 
+# only using its name as argument or read like fucntions
+# No need to specify full path
 
 # lets check our workign directiry
 getwd()
-setwd()
 setwd("C:/Users/UACecetoAl/Desktop/R_Input/2_ML_Course")
 getwd()
-# another funtion is extremely isefull
+#This directory of folder contains datasets we would use
+# in the following sections.
+# another funcion  is extremely isefull
 # to check what files are located in directory
 list.files()
+
 # fucntion serves well
 # to check correct name of file, extension or 
 # to import files via loop, or just copy file name
 
-# lets assume that out data is located in CSV file
+# if we want to check files not in 
+#working directory , we need to specify absolute path
+list.files("C:/Users/UACecetoAl/Desktop/R_Input/2_ML_Course")
+
+
+# lets assume that out data is stored as CSV file
 # in our working directory
-# common way is to use read.csv function
+# common way is to use read.csv function.
 # File I would upload occupies  almost 
 # million rows ,weights apr 100mb, 
 # I am russin speaker and I refer as 
 # file weight not file size
 # lets check how fast it would be uploaded
+list.files()
 t1<-Sys.time()
 sample_1<-read.csv("1_sample.csv") # make error
 Sys.time()-t1
-glimpse(sample_1)
+tibble::glimpse(sample_1)
+print( object.size(sample_1),units="Mb"  )
 # data in our file has column names and by default read.csv
 # assumes that column names are first row
 # of uploaded file, also R autimatically detects
-# type of data in each column
+# type of data in each column, 
+#by the wau , all data is randomly generated
 
 
 # here is example where we specify absolute file path
 sample_1<-read.csv("C:/Users/UACecetoAl/Desktop/R_Input/2_ML_Course/1_sample.csv")
-glimpse(sample_1)
+tibble::glimpse(sample_1)
 # Output is the same because file is located in 
-# working directory and we dont need to specify absolute path
+# working directory 
 
 
 # common paramenters to remember when working with 
@@ -267,22 +317,25 @@ glimpse(sample_1)
 sample_1<-read.csv("1_sample.csv",header = FALSE)
 # as I said before, if header parameter is not specified
 # r assumes that heades is True
-glimpse(sample_1)
+tibble::glimpse(sample_1)
 # R automacally assigned unique column names
 # notice that now all column are of character type
 
 # how about stringsAsFactors argument
 sample_1<-read.csv("1_sample.csv",header = TRUE,stringsAsFactors = TRUE)
-glimpse(sample_1)
-# factors are used to add behaviour of numbers to characters
+tibble::glimpse(sample_1)
+# Horoso, columns which previously were converted to characters
+# , now represent factors
+# factors are used to add behaviour of numbers to categorical data,
 # we will go back to factors later, but remember 
 # if data in initial file is organised in 
 # spreadshit form, where each column forms a separate variable,
+# and each column has name.
 # read.csv should perform very well.
 
-# one more work apect to remembet
+# one more work apect to remember
 sample_1<-read.csv("1_sample.csv",header = TRUE)
-glimpse(sample_1)
+tibble::glimpse(sample_1)
 # R is pretty god in distinguishing numbers from 
 # characters 
 
@@ -292,43 +345,19 @@ glimpse(sample_1)
 # making the best guess which type of data 
 # is suited to values in column
 
-# what should we do if all record are worgly classified as
-# characters, to initiate this error we will
-# make column names, which are characters,  as first row value
-
-sample_1<-read.csv("1_sample.csv",header = FALSE)
-glimpse(sample_1)
-
-#Now all are characters
-#how to solve it:
-dim(sample_1)
-# not the best , but still a solution,
-# we can use colClasses argument to specify 
-# type of each column
-sample_1<-read.csv("1_sample.csv",header = FALSE,
-                   colClasses=c('numeric','numeric','numeric','character','numeric',
-                                "character","character","character",
-                                'numeric','numeric','numeric') )
-#order of define classes should follow order of columns in 
-#input file
-glimpse(sample_1)
-# now is much better
-# so remebner, most common argument for
-# read.csv are header,stringsasfactor and
-# colclasses in case r misses the correct type of column
-
 
 # There is better way both in terms of speed and correct
 # data type coertion
 # lets check fucntion read_csv from readr
-# which demontrates faster perfomace fompate to read.csv
+# which demontrates faster perfomace compare  to read.csv
 t1<-Sys.time()
 sample_1<-readr::read_csv("1_sample.csv")
 Sys.time()-t1
+print( object.size(sample_1),units="Mb"  )
 # first notice that read_csv shows what type of data 
 # was chosen for each column 
 
-# definately it workds faster for our large file
+# definately it workds faster for our large file.
 # arguemnts to remember again are col_names insted of header
 # skip_empty_rows which by default equls to TRUE 
 # and it skips rows with no values.
@@ -339,10 +368,12 @@ Sys.time()-t1
 
 #first of all col_names
 sample_1<-readr::read_csv("1_sample.csv", col_names = FALSE)
+tibble::glimpse(sample_1)
 # as you can see , now actual column names form first record,
 # and therefore, all columns are coerced to character type
 # Overall, if 
-# possible use read_csv() as faster option
+# possible use read_csv() as faster option, assign and
+# meaningfull column names.
 
 # CSV is a good mean to transfer data, but 
 # how about excel file
@@ -350,12 +381,13 @@ sample_1<-readr::read_csv("1_sample.csv", col_names = FALSE)
 # we would require read_excel() fucntion
 readxl::read_excel()
 # common arguments are "sheet" where we can specify
-# both name of sheet or its order
+# both name of order of sheet to read data form
 
 sample_1<-readxl::read_excel("1_sample.xlsx", col_names = TRUE)
+str(sample_1)
 # we get empty tibble, because by defaul read_excel imports data 
-# from first sheet of excel, but the data we wanr in stored in 
-#second list
+# from first sheet of excel, but the data we want in stored in 
+# second list
 
 
 # if you dont remember sheet names, we can use
@@ -372,51 +404,65 @@ readxl::excel_sheets("1_sample.xlsx")
 
 # end now we can read data from 
 sample_1<-readxl::read_excel("1_sample.xlsx", sheet=2,col_names = TRUE)
+str(sample_1)
+print(object.size(sample_1)  ,unit="Mb")
 
-
+# or we can define sheet name
 t1<-Sys.time()
 sample_1<-readxl::read_excel("1_sample.xlsx", sheet="1_sample",col_names = TRUE)
 Sys.time()-t1 
 
-#if you playing music it can take even more time
-# definately it takes so times, we can speed up it a little bit by
-# adjustin guess_max argument
+# if you playing music while coding it can take even more time
+# we can speed up it a little bit by
+# defining data we know in advance , rather that asking r to guess it
+# according to internal rules
 
 t1<-Sys.time()
-sample_1<-readxl::read_excel("1_sample.xlsx", sheet="1_sample",col_names = TRUE,guess_max=10)
+sample_1<-readxl::read_excel("1_sample.xlsx", sheet="1_sample",col_names = TRUE,
+                            n_max=10^6+1,guess_max = 10,
+                            trim_ws = FALSE)
 Sys.time()-t1
+# Difference are miniscule , but for multiple files , this
+# differece can sum up into signifficant number
 
-# Now as final part relates to data upload practice
+
+# Greate job, few more fucntion sot check
 # lest check how to deal with data sored as text
 # here our weapon of choince is read.table fcuntion
 
 # how to read data where column values are separated with comma,
+#lets have a look on original file
 # well , we adjust sep argument
-read.table("1_sample.txt",nrows=10,sep=",",header=TRUE)
+read.table("1_sample.txt",sep=",",header=TRUE)
 
-# how to read data where column values are separated with comma,
-# well , we adjust sep argument , specifying tab
-read.table("2_sample.txt",nrows=10,sep="\t",header=TRUE)
+# how to read data where column values are separated with tab,
+# well , we adjust sep argument , specifying tab via dasjh t
+read.table("2_sample.txt",sep="\t",header=TRUE)
 
 # and finally, here is how to upload data separated by dash
-read.table("3_sample.txt",nrows=10,sep="/",header=TRUE)
+read.table("3_sample.txt",sep="/",header=TRUE)
 
 
 
-# overall, 3 fucnton are good to remember,
+# Horoso , to sup up, 3 fucnton are greate to remember,
+# to correctly define location and inpout data
 # getwd()
 # setwd()
-# list.file()
+# list.file() and excel_sheets
+#
+#to upload data we can use
 # read_csv() or read.csv()
-# read.xlsx for excel files and
-# finally read.table
-
- 
-
-
+# read.excel for excel files and
+# finally read.table fot text data
+# Make sure that column  represent meaninfull 
+# names and set header equal to true.
 
 
-                   # 3 Taking care of Missing Data
+
+
+
+
+            # 3 Taking care of Missing Data
 
 #lets create sample vector with  NA Values
 vector_1<-sample( c(rnorm(5,10,2)), 10, replace = TRUE)
