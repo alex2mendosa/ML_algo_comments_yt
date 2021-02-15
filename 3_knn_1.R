@@ -11,116 +11,102 @@ sample_1<-tibble( x1=rnorm(n,10,2),
 
 glimpse(sample_1)
 
+#######################  PART_1
+# knn is example of supervised , classification technique
 
-# knn is example of unsupervised , automated clustering technique
-# unsupervised utomated clustering means that we dont know in advance 
-# how to classify, we dont know how to label instances or rows
-# and our goal to define possible meaningfull groupping based on
-# intristic characteristics of data
 
-# to initiate knn the follwong action shoul be taken
-Data normalisation or preprocessing
-Splitin data into trinint and testinf sets
-fitting the model to training data
-evaluate perfomance on test data
-model tuning , specifically determining oprimal values of k
+#  To initiate knn the follwong action shoul be taken:
+#  Data inspection and normalisation
+#  Splitin data into training and testing datasets
+#  Fitting the model to training data
+#  Evaluate perfomance on test data
+#  Model tuning , specifically, for knn, determining optimal values of k
 
-knn fully reveals itself when applied to type homogenous data, speficically,
-it is suited very well to numerical features
+# knn is extremely powerfull when applied
+# to homogenous data, speficically,
+# it is suited very well to numerical features
 
-General routone for knn is the following:
-## ?
+# General routone for knn is the following:
+  ## ?
   
-Now hoe to measere similary of instances or records
-Traditioally euclidian distance us applied
+ #  Now how to measure similary of instances or records
+ #  Traditionally euclidian distance us applied
 
-assume 2 dimentional space with 2 poins
+ # assume 2 dimentional space with 2 poins
 
-sample_2<-tibble( feature=c( rnorm(1,10,1),rnorm(1,5,1)  ) , 
-                  instance=c( "x1","x2" ) )
-here we have 2 instances x1 and x2, with 1 feature
-
-ggplot(data=sample_2,aes(y=feature,x=instance))+
-    geom_point(col="red")
-
-Now assume , we need to decide , to which instance 
-we should assigh new point equl to 5.99
-
-ggplot(data=sample_2,aes(y=feature,x=instance))+
-  geom_point(col="red")+geom_point(aes(y=5.99),col="blue",cex=2)+
-  geom_segment(x="x1",y=6,xend = "x1", yend = sample_2$feature[1])+
-  geom_segment(x="x2",y=6,xend = "x2", yend = sample_2$feature[2])
+sample_2<-data.frame(  feature_BMI=c( runif(1,18.5,24.9),
+                                      runif(1, 25.0,29.9)),
+                       class=c( "Healthy weight","Overweight" ),
+                       row.names=c("inst_1  ","inst_2  ")   )
 
 
+ggplot(data=sample_2,aes(y= feature_BMI ,x=class))+
+  geom_point(col="red",cex=3)+
+  geom_label(aes(label=round(feature_BMI,2)  ),nudge_y = 0.5 )
+  
+  
+# Now assume , we need to decide , to which instance 
+# we should assign new point , should it belong to 
+# Forst or second class
 
-boystown<-read.csv("https://umich.instructure.com/files/399119/download?down
-load_frd=1", sep=" ")
-boystown$sex<-boystown$sex-1
-boystown$dadjob<--1*(boystown$dadjob-2)
-boystown$momjob<--1*(boystown$momjob-2)
-str(boystown)
+set.seed(3211)
+new_point<-runif(1,18.5,29.9)
 
-boystown<-boystown[, -1]
-table(boystown$gpa)
-
-boystown$grade<-boystown$gpa %in% c(3, 4, 5)
-boystown$grade<-factor(boystown$grade, levels=c(F, T), labels = c("above_avg
-", "avg_or_below"))
-table(boystown$grade)
-
-normalize<-function(x){
-  # be careful, the denominator may be trivial!
-  return((x-min(x))/(max(x)-min(x)))
-}
-
-
-boystown_n<-as.data.frame(lapply(boystown[-11], normalize))
-
-bt_train<-boystown_n[1:150, -11]
-bt_test<-boystown_n[151:200, -11]
-
-bt_train_labels<-boystown[1:150, 11]
-bt_test_labels<-boystown[151:200, 11]
-
-library(class)
-bt_test_pred<-knn(train=bt_train, test=bt_test, cl=bt_train_labels, k=14)
-
-
-bt_test_1<-bt_test[1,]
-bt_test_labels_1<-bt_test_labels[1]
-
-
-dif_1<-bt_test_1[rep(1,nrow(bt_train)),1:ncol(bt_train)]
-#bt_test_1[ c(1,1,1),2:4 ]
-sqrt( rowSums( (bt_train-dif_1)^2 ))
-
-a1<-tibble(dif=sqrt( rowSums( (bt_train-dif_1)^2 )),bt_train_labels ) %>% 
-     arrange(dif) %>% slice(1:14)
-table(a1$bt_train_labels)
-
-
-library(class)
-library(ggplot2)
-# define a function that generates CV folds
-cv_partition <- function(y, num_folds = 10, seed = NULL) {
-  if(!is.null(seed)) {
-    set.seed(seed)
-  }
-  n <- length(y)
-  folds <- split(sample(seq_len(n), n), gl(n = num_folds, k=1, length=n))
-  folds <- lapply(folds, function(fold) {
-    list(
-      training = which(!seq_along(y) %in% fold),
-      test = fold
-    )
-  })
-  names(folds) <- paste0("Fold", names(folds))
-  return(folds)
-}
-
-cv_partition(bt_train_labels, num_folds = 10)
+ggplot(data=sample_2,aes(y= feature_BMI ,x=class))+
+  geom_point(col="red",cex=4)+
+  geom_label(aes(label=round(feature_BMI,2)  ),nudge_y = 0.1,nudge_x=0.2 )+
+  geom_point(col="red")+geom_point(aes(y=new_point),col="blue",cex=5) +
+  geom_segment(x="Healthy weight",y=new_point,xend = "Healthy weight", yend = sample_2$feature_BMI[1],
+                     color="green")+
+  geom_segment(x="Overweight",y=new_point,xend = "Overweight", yend = sample_2$feature_BMI[2],
+               color="green")
 
 
 
+
+tibble::glimpse(sample_2)
+sample_2
+
+# lest estimate Euclidian Distance between 2 poins, we have only 1 instance
+#per feature , threfore we would check knn where k in one 
+
+dist_1<- sqrt( (new_point-sample_2$feature_BMI[1])^2 )
+dist_2<- sqrt( (new_point-sample_2$feature_BMI[2])^2 )
+
+sample_2["Eu_Dist"]<-c(dist_1 ,dist_2 )
+
+
+sample_2<-sample_2 %>% mutate(Eu_Dist=sqrt( (new_point-feature_BMI)^2 ))
+
+# now lets add new record
+
+sample_2<-sample_2 %>% dplyr::bind_rows( tibble(feature_BMI=new_point,class=NA,Eu_Dist=NA) )
+sample_2$class[3]<-"Healthy weight"
+sample_2$class[3]<-sample_2$class[ which.min(sample_2$Eu_Dist) ]
+
+
+class::knn( sample_2[c(1,2),1],new_point,sample_2[c(1,2),2],k=1, prob=TRUE )
+
+#######################  PART_2
+
+sample_3<-data.frame(  feature_BMI=c( runif(3,18.5,24.9),
+                                      runif(3, 25.0,29.9)),
+                       class=c( rep("Healthy weight",3),rep("Overweight",3) ) )
+
+
+ggplot(data=sample_3,aes(y= feature_BMI ,x=class))+
+  geom_point(col="red",cex=6)+
+  geom_label(aes(label=round(feature_BMI,2)  ),nudge_y = 0.1,nudge_x=0.2 )+
+  geom_point(col="red")+geom_point(aes(y=new_point),col="blue",cex=5) 
+
+sample_3<-sample_3 %>% mutate(Eu_Dist=sqrt( (new_point-feature_BMI)^2 ))
+
+# Assume that k equals 3 , threrefore we need to choode free nearest neighbours
+
+sample_3 <-sample_3 %>% arrange(Eu_Dist) %>% slice(1:3)
+
+prop.table( table(sample_3$class) )
+
+class::knn( sample_3[,1],new_point,sample_3[,2],k=3, prob=TRUE )
 
 
