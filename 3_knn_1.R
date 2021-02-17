@@ -113,7 +113,7 @@ class::knn( sample_3[,1],new_point,sample_3[,2],k=3, prob=TRUE )
 
 
 
-                    ##### PART 3
+##### PART 3
 
 sample_4<-iris
 View(sample_4)
@@ -154,17 +154,17 @@ test_row_1
 # this transformation i srequired 
 # to apply ggplot with facets
 gg_train<-train_row_2 %>% pivot_longer(Sepal.Length:Petal.Width ,
-                             names_to="Feature")
+                                       names_to="Feature")
 gg_test<-test_row_1 %>% pivot_longer(Sepal.Length:Petal.Width ,
-                                       names_to="Feature") %>%
-                     mutate(C="Unknown")  
+                                     names_to="Feature") %>%
+  mutate(C="Unknown")  
 
 gg_in<-bind_rows(gg_train,gg_test)
 ggplot(data=gg_in,aes(y=Species,x=value))+ 
-    geom_point(aes(col= Species),cex=3)+
-    geom_label(aes(label=round(value,2),color=Species )   ) + 
-    facet_grid(~Feature, scales="free_x") 
-   
+  geom_point(aes(col= Species),cex=3)+
+  geom_label(aes(label=round(value,2),color=Species )   ) + 
+  facet_grid(~Feature, scales="free_x") 
+
 
 
 train_row_2[,-5]-test_row_1[ c(1,1),-5 ]
@@ -174,13 +174,13 @@ train_row_2[,-5]-test_row_1[ c(1,1),-5 ]
 Eu_Dist=rowSums( (train_row_2[,-5]-test_row_1[ c(1,1),-5 ])^2 ) %>% sqrt()
 
 train_row_2<- train_row_2 %>% 
-              mutate(Eu_Dist=Eu_Dist) %>%
-              arrange(Eu_Dist)
+  mutate(Eu_Dist=Eu_Dist) %>%
+  arrange(Eu_Dist)
 
 knn( train=train_row_2[,-5],
-            test=test_row_1[ ,-5 ],
-            cl=train_row_2[,5],
-            prob=TRUE)
+     test=test_row_1[ ,-5 ],
+     cl=train_row_2[,5],
+     prob=TRUE)
 
 
 ### Lets apply knn to each onbservation 
@@ -191,11 +191,70 @@ test_set<-sample_4[ loc   ,  ]
 train_set<-sample_4[ -loc   ,  ]
 
 m1_knn<-knn( train=train_set[,-5],
-     test=test_set[ ,-5 ],
-     cl=train_set[,5], k=3,
-     prob=TRUE)
+             test=test_set[ ,-5 ],
+             cl=train_set[,5], k=3,
+             prob=TRUE)
 
 sum(m1_knn==test_set[ ,5 ])/ length(test_set[ ,5 ])
 
+##  now lest write our own fucntion to come up with solution 
+
+  test<-sample_4[ loc   ,  ]
+  train<-sample_4[ -loc   ,  ]
+  out_2<- test[,5]
+  
+    n_test<-nrow(test)
+    n_train<-nrow(train)
+    out<-rep("",n_test)
+    
+    for ( i in 1:n_test) {
+    Eu_Dist=rowSums( (train[,-5]-test[i,-5][c(rep(1,n_train)), ] )^2 ) %>% sqrt()
+    train_1<-train %>% mutate(Eu_Dist=Eu_Dist) %>% arrange(Eu_Dist) %>%
+                                             slice(1:3)
+    class_1<-names( which.max(table(train_1$Species)))
+    out[i]<-class_1
+                         } 
+
+    sum(out==out_2)/ n_test
+    
+    # identical 
 
 
+# now lets multiply each column by random number
+    loc<-sample(1:nrow(sample_4),20 )
+ sample_5<-iris
+ sample_5[,c(1)]<-apply(sample_5[,c(1)],MARGIN=1:2, 
+                   function(x) return( x*runif(1,10,10000))  )
+ sample_5[,c(1)]/iris[,c(1)] 
+   
+    test<-sample_5[ loc   ,  ]
+    train<-sample_5[ -loc   ,  ]
+    out_2<- test[,5]
+    
+    n_test<-nrow(test)
+    n_train<-nrow(train)
+    out<-rep("",n_test)
+    
+    m1_knn<-knn( train=train[,-5],
+                 test=test[ ,-5 ],
+                 cl=train[,5], k=3,
+                 prob=TRUE)
+    
+    sum(m1_knn==test[ ,5 ])/ length(test[ ,5 ])
+
+
+    normalize<-function(x){
+      return((x-min(x))/(max(x)-min(x)))
+    }      
+    
+    train[,-5]<-apply(train[,-5], MARGIN=2 ,normalize)
+    
+    m1_knn<-knn( train=train[,-5],
+                 test=test[ ,-5 ],
+                 cl=train[,5], k=3,
+                 prob=TRUE)
+    
+    sum(m1_knn==test[ ,5 ])/ length(test[ ,5 ])
+    
+    
+ 
