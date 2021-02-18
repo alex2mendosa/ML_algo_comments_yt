@@ -1,20 +1,20 @@
 # we would require 5 libraries to explore and 
 # learn mechanics of k nearest neighbours
 
-library(dplyr) # data wrangling
-library(tidyr) # data wrangling
+library(dplyr)  # data wrangling
+library(tidyr)  # data wrangling
 library(tibble) # data wrangling
 library(ggplot2) # visuals
 library(class)  # model building
 
 
 #######################  PART_1
-# knn is example of supervised classification technique
-# supervised means than we know all classes which corresponds
-# to specific set of feature or variables grouped by rows or instances
+# knn is example of supervised classification technique,
+# supervised means that all rows or instances  
+# are labeled with specific class or outcome
 
-# classification means that we would model output 
-# as variable ofcharacter or factor type
+# classification means that our output is
+#  variable of character or factor type
 
 #  To initiate knn the follwong action shoul be taken:
 #  Data inspection 
@@ -30,12 +30,12 @@ library(class)  # model building
 # data range is similar
 
 # Goal of Knn is to 
-# Estimate similarity between records with defined classes and 
-# and  records without defined class
+# Estimate similarity between records with defined classes with 
+# records without defined class
 
-#  Now, how to measure similary of instances or records?
-#  We need to employ distacne formula,
-# Euclidian distance is a common approach
+#  Now, how to measure similary of records?
+#  We need to employ distance formula,
+#  Euclidian distance is a common approach
 
 # assume 2 dimentional space with 2 points
 
@@ -43,11 +43,12 @@ sample_1<-data.frame(  feature_BMI=c( runif(1,18.5,24.9),
                                       runif(1, 25.0,29.9)),
                        class=c( "Healthy weight","Overweight" ),
                        row.names=c("inst_1  ","inst_2  ")   )
+
 #  code sampel is available at github ,fill free to replicate it
 # we can use View to explicitly check all records
 View(sample_1)
 
-#Greate job 
+# Greate job 
 # Now lets visualise situation we are dealing with 
 ggplot2::ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
   geom_point(col="red",cex=5)+
@@ -77,31 +78,24 @@ ggplot2::ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
 # we need to measure distance between red and blue point, 
 # green and blue point
 
-# Lets estimate Euclidian Distance between 2 poins, we have only 1 instance
-# per feature , threfore we would check knn where k in one 
+# Lets estimate Euclidian Distance between 2 poins
 
 dist_1<- sqrt( (new_point-sample_1$feature_BMI[1])^2 )
 dist_2<- sqrt( (new_point-sample_1$feature_BMI[2])^2 )
 
 #lets add new column to sample_1
-# here is common way to add column to data frame
-sample_1["Eu_Dist"]<-c(dist_1 ,dist_2 )
-
-#alternativeluy, we can use mutate fucntion
 sample_1<-sample_1 %>% dplyr::mutate(Eu_Dist=sqrt( (new_point-feature_BMI)^2 ))
 
-# now lets add new record with class we dont know
-
-sample_1<-sample_1 %>% dplyr::bind_rows( tibble(feature_BMI=new_point,class=NA,Eu_Dist=NA) )
+# now  add new record with class we dont know
+sample_1<-sample_1 %>%
+               dplyr::bind_rows( tibble(feature_BMI=new_point,class=NA,Eu_Dist=NA) )
 row.names(sample_1)[3]<-3
 
-# Value for Overweight is smaller, it is closer, therefore
+# Value for "Overweight"??? is smaller, it is closer, therefore
 # blue dot should belong to Overweignt class
 
-
-sample_1$class[3]<-"Healthy weight" # assign poing manually
 sample_1$class[3]<-sample_1$class[ which.min(sample_1$Eu_Dist) ] # use which.min, 
-                                                                 # ignores NA
+# ignores NA
 
 
 # how to implement the process with r fucntionality
@@ -131,7 +125,7 @@ ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
 
 #######################  PART_2
 
-# Horoso , now its time to check example with 1 , but with 
+# Horoso , now its time to check example with 1 feature, BMI , but with 
 # multiple records for each class
 sample_3<-data.frame(  feature_BMI=c( runif(3,18.5,24.9),
                                       runif(3, 25.0,29.9)),
@@ -173,7 +167,7 @@ prop.table( table(sample_3$class) ) # prop.table to wrup table is used to check 
 # number of records
 
 
-# How should hte process be implemented with R fucntionality
+# How should the  process be implemented with R fucntion
 class::knn( train=sample_3[,1],
             test=new_point,
             cl=sample_3[,2],k=3, 
@@ -196,13 +190,13 @@ View(sample_4)
 summary(sample_4[,-5])
 
 #judjing from summary, we can say that only Petal.Width 
-# is notably smaller that other features, but overall
+# is notably smaller compare to features, but overall
 # we can not conclude that particula feature
 # is extremely far from other 
 
 cat(   "sqrt(  (1000-5.0)^2+(2.7-2.0)^2+(3.9-3.5)^2     )"      )
 # this is equation fo EU distance for single 
-#record with 3 features, first valun in brackest is x
+# record with 3 features, first valun in brackest is x
 # We are conserned with feature range because 
 # EU distance is sensetive to outlies 
 # and , if lets say x1,1000, is significantluy greater
@@ -245,7 +239,7 @@ train_row_3<-sample_4[-loc,] %>% dplyr::group_by(Species) %>%
 train_row_3
 test_row_1
 
-# here we have 3 instances from taining set and 
+# here we have 3 instances from training set and 
 # we need to decide which is closer in terms of 
 # euclidian distance to test_row_1
 
@@ -254,8 +248,9 @@ test_row_1
 # to apply ggplot with facets
 gg_train<-train_row_3 %>% tidyr::pivot_longer(Sepal.Length:Petal.Width ,
                                               names_to="Feature") %>%
-                            rename("Class"="Species")  
-# here we Gather columns data from multiple rows into rows
+  rename("Class"="Species")  
+# here we Gather columns data from multiple column into rows
+#for train data
 
 gg_test<-test_row_1 %>% tidyr::pivot_longer(Sepal.Length:Petal.Width ,
                                             names_to="Feature") %>%
@@ -273,51 +268,49 @@ ggplot2::ggplot(data=gg_in,aes(y=Class,x=value))+
   theme_bw()
 
 #  Unknown  poins is present per each feature, Corresponding to
-# unknown class
-#  oterh dots are features from 3 instances  
+#  unknown class
+#  other  dots are features from 3 instances  
 #  of train set with defined class
 
-# 3 records and 1 test record means 3 equations, 4 features per record,
+# 3 train records and 1 test record means 3 equations, 4 features per record,
 # mean 4 operand in equation
 # here is Eu for single row
 
 cat( "sqrt(  (4.8-6)^2+(1.4-2.5)^2+(6.8-6.3)^2+(2.8-3.3)^2    )"      )
 
 #  Here we need to substract train set form test
-train_row_3[,-5]-test_row_1 # both have different rows , we need to triope
-# sinfle record in test set
+train_row_3[,-5]-test_row_1 # both have different rows , we need to triple
+# first  record in test set
 train_row_3[,-5]-test_row_1[ c(1,1,1),]   # here first rows is repeated 3 times
 # this is how to extract values element wise when dealing with 
 # data frames
 
-(train_row_3[,-5]-test_row_1[ c(1,1,1),] )^2 # nest spet is to  take square
-
 # the whole eaution with rowSums
 Euc_Dist=rowSums( (train_row_3[,-5]-test_row_1[ c(1,1,1), ])^2 ) %>% sqrt()
 
-# now we eould create additional column and arrange data, then pull 1 nearest
+# now we would create additional column and arrange data, then pull 1 nearest
 # neighbours because number of classes equals number of records
-train_row_3<- train_row_3 %>% ungroup() %>% mutate(Euc_Dist=Euc_Dist) %>%
-              arrange(Euc_Dist) %>% slice(1)
+train_row_3 %>% ungroup() %>% mutate(Euc_Dist=Euc_Dist) %>%
+  arrange(Euc_Dist) %>% slice(1)
 test_row_cl
-# we can conclude that 
 
-class::knn( train=train_row_3[,c(-5,-6)],
-            test=test_row_1,k=1,
-            cl=train_row_3[,5],
-            prob=TRUE)
+class::knn( train=train_row_3[,-5],
+            test=test_row_1,
+            cl=dplyr::pull(train_row_3[,5]), # here I use pull because cl accepts vector as input
+            k=1)                             
 
 
 ##### Greate Job, Not we would employ whole 
-# iris into 80,20 split,
-# 80% of records for trainig set and 20$ for test, therefore we need to classify 20%
+# iris dataset , with  80,20 split,
+# 80% of records for trainig set and 20$ for test, 
+# therefore we need to classify 20%
 # of records
 
 set.seed(253)
 loc<-sample(1:nrow(iris),nrow(iris)*0.2 ) # this are indices for test set
 test_set<-iris[ loc   , -5 ]
 test_set_cl<-iris[ loc   , 5 ]
-train_set<-iris[ -loc   , ]
+train_set<-iris[ -loc   , ] # use use minus to select rows which are not part of test set
 
 
 # How would knn fucntion perform
@@ -327,12 +320,12 @@ m1_knn<-knn( train=train_set[,-5],
              prob=TRUE)
 
 # now we stimate accuracy, how many values in 
-# m1_knn are equal to values in test set classes
+# m1_knn  equal to values in test set classes
 sum(m1_knn==test_set_cl)/ length(test_set_cl)
+
 
 ##  now lest write our own solution to soliduty understandng 
 ## of knn 
-
 n_test<-nrow(test_set)
 n_train<-nrow(train_set)
 out<-rep("",n_test) # out vecotr would store our result of classification 
