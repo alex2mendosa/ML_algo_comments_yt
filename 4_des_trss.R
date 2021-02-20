@@ -52,7 +52,7 @@ rpart.plot(m1)
 # instance is a set
 # of valus of attributes
 
-                                   
+
 d1 %>% arrange(Outlook,Wind,Humidity,Temperature,)
 # classification is easy if
 #This condition is that no two instances
@@ -76,7 +76,7 @@ d1 %>% arrange(Outlook,Wind,Humidity,Temperature,)
 # K is number of classes , pi is the q of class i
 # divided by the total number of instances
 entropy measures biits of information 
- 
+
 cat(" -sum(pi*log2(pi))  ")
 # this is expected numebr of biits for system
 
@@ -101,15 +101,62 @@ pia<-prop.table(table(s1))
 # single feature
 
 
+##
+# goal is to continue split until E is close to 0
+#
+
+path_golf<-r"(C:\Users\UACecetoAl\Desktop\R_Input\2_ML_Course\1_sample_lens24.csv)"
+d1<-readr::read_csv(path_golf,col_names = TRUE)
+View(d1)
+
+# what is entropy of  class given each feature
+
+s1<-d1$Class
+table(s1)
+pia<-prop.table(table(s1))
+-sum(pia*log2(pia))
 
 
+d1_l<-split(d1,d1$age)
+
+ent<-function(x){
+s1<-x$Class
+table(s1)
+pia<-prop.table(table(s1))
+entr<--sum(pia*log2(pia)) 
+return(entr)}
 
 
+sum(8/24*sapply(d1_l,ent))
+
+# share of each values of age feature is 8
+# therefore weighte entripy is
+
+lapply(d1_l,  nrow)
+
+# we compare entropy of class only ve weighted wntropy 
+# of class given split on feature
+
+# # The ‘entropy method’ of attribute selection is to choose to split on the
+# # attribute that gives the greatest reduction in
+# (average) entropy, i.e. the one
+# # that maximises the value of Information
+# Gain. This is equivalent to minimising
+# # the value of Enew as Estart is fixed.
 
 
+# lets choose ent given each feature
 
+d1_l2<-split(d1,d1$astig)
 
-
+ent<-function(x){
+  s1<-x$Class
+  table(s1)
+  pia<-prop.table(table(s1))
+  entr<--sum(pia*log2(pia)) 
+  return(entr)
+  }
+sum(12/24*sapply(d1_l2,ent))
 
 
 
