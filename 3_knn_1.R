@@ -13,8 +13,8 @@ library(class)  # model building
 # supervised means that all rows or instances  
 # are labeled with specific class or outcome
 
-# classification means that our output is
-#  variable of character or factor type
+#  classification means that our class is
+#  categorical variable
 
 #  To initiate knn the follwong action shoul be taken:
 #  Data inspection 
@@ -88,7 +88,7 @@ sample_1<-sample_1 %>% dplyr::mutate(Eu_Dist=sqrt( (new_point-feature_BMI)^2 ))
 
 # now  add new record with class we dont know
 sample_1<-sample_1 %>%
-               dplyr::bind_rows( tibble(feature_BMI=new_point,class=NA,Eu_Dist=NA) )
+  dplyr::bind_rows( tibble(feature_BMI=new_point,class=NA,Eu_Dist=NA) )
 row.names(sample_1)[3]<-3
 
 # Value for "Overweight"??? is smaller, it is closer, therefore
@@ -101,7 +101,7 @@ sample_1$class[3]<-sample_1$class[ which.min(sample_1$Eu_Dist) ] # use which.min
 # how to implement the process with r fucntionality
 # we would call for knn fucntion from class package
 class::knn( train=sample_1[c(1,2),1], # we define training set, and esclude column with classes 
-            test=new_point, # define value ww need to classify
+            test=new_point, # define value we need to classify
             cl=sample_1[c(1,2),2], # indicate classes which coreslond to known record
             k=1 ) # how many neighbours to consider
 
@@ -137,7 +137,7 @@ ggplot(data=sample_3,aes(y= feature_BMI ,x=class))+
   geom_label(aes(label=round(feature_BMI,2)  ),nudge_y = 0.1,nudge_x=0.2 )+
   geom_point(col="red")+geom_point(aes(y=new_point),col="blue",cex=5) +
   geom_label(aes(label=round(new_point,2),x=class,y=new_point  ),nudge_y = 0.1,nudge_x=0.2,color="blue" )
-# Again , now we need to use 6 red poind in total to decide 
+# Again , now we need to use 6 red poins l to decide 
 # for which class blue point belongs, therefore, here we estimate
 # 6 values for Euclidian distacne
 
@@ -163,7 +163,7 @@ sample_3 <-sample_3 %>% dplyr::arrange(Eu_Dist) %>% dplyr::slice(1:3)
 
 table(sample_3$class) # now we use table to count uniqu classes
 prop.table( table(sample_3$class) ) # prop.table to wrup table is used to check share of class
-# among oter classes, we divide count of overweight records by total
+# among other classes, we divide count of overweight records by total
 # number of records
 
 
@@ -179,7 +179,7 @@ class::knn( train=sample_3[,1],
 
 ############ PART 3
 
-# Knn is great classifying tool gof data with homogenous 
+# Knn is great classifying tool for data with homogenous 
 # records, for example in iris dataset all features are
 #of numeric type
 sample_4<-iris
@@ -190,7 +190,7 @@ View(sample_4)
 summary(sample_4[,-5])
 
 #judjing from summary, we can say that only Petal.Width 
-# is notably smaller compare to features, but overall
+# is notably smaller compare to other features, but overall
 # we can not conclude that particula feature
 # is extremely far from other 
 
@@ -267,8 +267,7 @@ ggplot2::ggplot(data=gg_in,aes(y=Class,x=value))+
   facet_grid(~Feature,  space="free") +
   theme_bw()
 
-#  Unknown  poins is present per each feature, Corresponding to
-#  unknown class
+#  Unknown  Class  is present per each feature
 #  other  dots are features from 3 instances  
 #  of train set with defined class
 
@@ -363,6 +362,16 @@ for (i in (1:10) )  {
   print( paste( i,": Accuracy of ",  acc ) )
 }
 
-# We can conllude, that largest accuracy can be achieved at 
+
+# Greate job everyone.
+# Knn  is straighforward, easy-to-implement 
+# supervised machine learning algorithm that can be
+# used to solve both classification  challenhes.
+
+# It works especially well  when features form 
+#  homogenous numerical data , the poijt of convern is to 
+# choose oprimal K values to achieve higest accuracy
+
+
 
 
