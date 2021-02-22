@@ -51,7 +51,7 @@ View(sample_1)
 # Greate job 
 # Now lets visualise situation we are dealing with 
 ggplot2::ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
-  geom_point(col="red",cex=5)+
+  geom_point(col="red",cex=10)+
   geom_label(aes(label=round(feature_BMI,2)  ),nudge_y = 0.5 )
 
 # we have 2 values for single feature,
@@ -65,9 +65,9 @@ new_point<-runif(1,18.5,29.9) # generate random point
 
 # lets take advantage of ggplot2 again
 ggplot2::ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
-  geom_point(aes(col=class),cex=5)+
+  geom_point(aes(col=class),cex=10)+
   geom_label(aes(label=round(feature_BMI,2)  ),nudge_y = 0.1,nudge_x=0.2 )+
-  geom_point(col="red")+geom_point(aes(y=new_point),col="blue",cex=6) +
+  geom_point(col="red")+geom_point(aes(y=new_point),col="blue",cex=11) +
   geom_segment(x="Healthy weight",y=new_point,xend = "Healthy weight", yend = sample_1$feature_BMI[1],
                color="green")+
   geom_segment(x="Overweight",y=new_point,xend = "Overweight", yend = sample_1$feature_BMI[2],
@@ -94,11 +94,11 @@ row.names(sample_1)[3]<-3
 # Value for "Overweight"??? is smaller, it is closer, therefore
 # blue dot should belong to Overweignt class
 
-sample_1$class[3]<-sample_1$class[ which.min(sample_1$Eu_Dist) ] # use which.min, 
-# ignores NA
+sample_1$class[3]<-sample_1$class[ which.min(sample_1$Eu_Dist) ] 
+# use which.min, # ignores NA
 
 
-# how to implement the process with r fucntionality
+# how to implement the process with buid in r fucntion
 # we would call for knn fucntion from class package
 class::knn( train=sample_1[c(1,2),1], # we define training set, and esclude column with classes 
             test=new_point, # define value we need to classify
@@ -107,9 +107,9 @@ class::knn( train=sample_1[c(1,2),1], # we define training set, and esclude colu
 
 # to sum up , lets proceed to ggplot 2
 ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
-  geom_point(col="red",cex=4)+
+  geom_point(col="red",cex=8)+
   geom_label(aes(label=round(feature_BMI,2)  ),nudge_y = 0.1,nudge_x=0.2 )+
-  geom_point(col="red")+geom_point(aes(y=new_point),col="blue",cex=5) +
+  geom_point(col="red")+geom_point(aes(y=new_point),col="blue",cex=9) +
   geom_segment(x="Healthy weight",y=new_point,xend = "Healthy weight", yend = sample_1$feature_BMI[1],
                color="green")+
   geom_segment(x="Overweight",y=new_point,xend = "Overweight", yend = sample_1$feature_BMI[2],
@@ -127,9 +127,11 @@ ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
 
 # Horoso , now its time to check example with 1 feature, BMI , but with 
 # multiple records for each class
+set.seed(123)
 sample_3<-data.frame(  feature_BMI=c( runif(3,18.5,24.9),
                                       runif(3, 25.0,29.9)),
                        class=c( rep("Healthy weight",3),rep("Overweight",3) ) )
+
 
 # We inspect Visuals
 ggplot(data=sample_3,aes(y= feature_BMI ,x=class))+
@@ -137,8 +139,8 @@ ggplot(data=sample_3,aes(y= feature_BMI ,x=class))+
   geom_label(aes(label=round(feature_BMI,2)  ),nudge_y = 0.1,nudge_x=0.2 )+
   geom_point(col="red")+geom_point(aes(y=new_point),col="blue",cex=5) +
   geom_label(aes(label=round(new_point,2),x=class,y=new_point  ),nudge_y = 0.1,nudge_x=0.2,color="blue" )
-# Again , now we need to use 6 red poins l to decide 
-# for which class blue point belongs, therefore, here we estimate
+# Again , now we need to use 6 red poins  to decide 
+# to which class blue point belongs, therefore, here we estimate
 # 6 values for Euclidian distacne
 
 #mutate fucntion would be quite handy
@@ -156,7 +158,8 @@ ggplot2::ggplot(data=sample_3,aes(y= feature_BMI ,x=class))+
                  x="Healthy weight",y=new_point  ),nudge_y = 2,nudge_x=0 )
 # same calculation are aplied to column Overweignt
 
-# Assume that k equals 3 , threrefore we need to choode free nearest neighbours,
+# Assume that k equals 3 , threrefore we need to choode
+# free nearest neighbours,
 # or 3 lowers values for distance
 
 sample_3 <-sample_3 %>% dplyr::arrange(Eu_Dist) %>% dplyr::slice(1:3)
@@ -165,7 +168,6 @@ table(sample_3$class) # now we use table to count uniqu classes
 prop.table( table(sample_3$class) ) # prop.table to wrup table is used to check share of class
 # among other classes, we divide count of overweight records by total
 # number of records
-
 
 # How should the  process be implemented with R fucntion
 class::knn( train=sample_3[,1],
@@ -185,8 +187,8 @@ class::knn( train=sample_3[,1],
 sample_4<-iris
 View(sample_4)
 
-# Now , lets check how exactly features are dissimilart in 
-# ters of central tendency and spread
+# Now , lets check how exactly features are dissimilar in 
+# terms  of central tendency and spread
 summary(sample_4[,-5])
 
 #judjing from summary, we can say that only Petal.Width 
@@ -267,7 +269,7 @@ ggplot2::ggplot(data=gg_in,aes(y=Class,x=value))+
   facet_grid(~Feature,  space="free") +
   theme_bw()
 
-#  Unknown  Class  is present per each feature
+#  Unknown  Class  is present per each feature,
 #  other  dots are features from 3 instances  
 #  of train set with defined class
 
@@ -309,7 +311,8 @@ set.seed(253)
 loc<-sample(1:nrow(iris),nrow(iris)*0.2 ) # this are indices for test set
 test_set<-iris[ loc   , -5 ]
 test_set_cl<-iris[ loc   , 5 ]
-train_set<-iris[ -loc   , ] # use use minus to select rows which are not part of test set
+train_set<-iris[ -loc   , ] # use use minus
+          #to select rows which are not part of test set
 
 
 # How would knn fucntion perform
@@ -335,7 +338,6 @@ out<-rep("",n_test) # out vecotr would store our result of classification
 
 i<-1
 for ( i in 1:n_test) {
-  
   # lets check each operand
   Eu_Dist=rowSums( (train_set[,-5] - test_set[i,][c(rep(1,n_train)), ] ) ^2 ) %>% sqrt()
   train_buf<-train_set %>% mutate(Eu_Dist=Eu_Dist) %>% arrange(Eu_Dist) %>%
@@ -346,6 +348,10 @@ for ( i in 1:n_test) {
 
 sum(out==test_set_cl)/ n_test
 
+
+# WE ESTIMATE EUCLIDIAN DISTANCE, WE adjust size of test set to size of
+# training set, we use which.max and table to find most 
+# common  clan wihtoin 3 rows
 
 ## finaly , lets combine knn fucntion and loop to 
 ## chack if our accuracy can be improved
@@ -366,12 +372,10 @@ for (i in (1:10) )  {
 # Greate job everyone.
 # Knn  is straighforward, easy-to-implement 
 # supervised machine learning algorithm that can be
-# used to solve both classification  challenhes.
+# used to solve  classification  challenhes.
 
 # It works especially well  when features form 
-#  homogenous numerical data , the poijt of convern is to 
+#  homogenous numerical data , the point  of convern is to 
 # choose oprimal K values to achieve higest accuracy
-
-
 
 
