@@ -13,9 +13,6 @@ library(class)  # model building
 # supervised means that all rows or instances  
 # are labeled with specific class or outcome
 
-#  classification means that our class is
-#  categorical variable
-
 #  To initiate knn the follwong action shoul be taken:
 #  Data inspection 
 #  Splitting data into training and testing datasets
@@ -23,11 +20,6 @@ library(class)  # model building
 #  Evaluate perfomance on test data
 #  Model tuning , specifically, for knn, to determine optimal values of k
 
-
-# knn is extremely powerfull when applied
-# to homogenous data, speficically,
-# it is suited very well to numerical features whose 
-# data range is similar
 
 # Goal of Knn is to 
 # Estimate similarity between records with defined classes with 
@@ -52,7 +44,8 @@ View(sample_1)
 # Now lets visualise situation we are dealing with 
 ggplot2::ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
   geom_point(col="red",cex=10)+
-  geom_label(aes(label=round(feature_BMI,2)  ),nudge_y = 0.5 )
+  geom_label(aes(label=round(feature_BMI,2)  ),nudge_y = 0.5 )+
+  theme(axis.text=element_text(size=15) )
 
 # we have 2 values for single feature,
 # each value corresponds to specific class
@@ -72,7 +65,8 @@ ggplot2::ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
                color="green")+
   geom_segment(x="Overweight",y=new_point,xend = "Overweight", yend = sample_1$feature_BMI[2],
                color="green")+
-  geom_label(aes(label=round(new_point,2),x=class,y=new_point  ),nudge_y = 0.1,nudge_x=0.2 )
+  geom_label(aes(label=round(new_point,2),x=class,y=new_point  ),nudge_y = 0.1,nudge_x=0.2 )+
+  theme(axis.text=element_text(size=15) )
 
 # blue point can potentially belong to class 1 or 2
 # we need to measure distance between red and blue point, 
@@ -86,13 +80,13 @@ dist_2<- sqrt( (new_point-sample_1$feature_BMI[2])^2 )
 #lets add new column to sample_1
 sample_1<-sample_1 %>% dplyr::mutate(Eu_Dist=sqrt( (new_point-feature_BMI)^2 ))
 
-# now  add new record with class we dont know
+# now add new record with class we dont know
 sample_1<-sample_1 %>%
   dplyr::bind_rows( tibble(feature_BMI=new_point,class=NA,Eu_Dist=NA) )
 row.names(sample_1)[3]<-3
 
-# Value for "Overweight"??? is smaller, it is closer, therefore
-# blue dot should belong to Overweignt class
+# Value for "Healthy weight"??? is smaller, it is closer, therefore
+# blue dot should belong to Healthy weight class
 
 sample_1$class[3]<-sample_1$class[ which.min(sample_1$Eu_Dist) ] 
 # use which.min, # ignores NA
@@ -117,28 +111,30 @@ ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
   geom_label(aes(label=round(new_point,2),x=class,y=new_point  ),nudge_y = 0.1,nudge_x=0.2 )+
   geom_label(aes(label=paste( "sqrt","(","(",round(new_point,2),"-",
                               round(feature_BMI[1],2) ,")","^2",")"),
-                 x="Healthy weight",y=new_point  ),nudge_y = 2,nudge_x=0 )+
+                 x="Healthy weight",y=new_point  ),nudge_y = 2,nudge_x=0,size=5 )+
   geom_label(aes(label=paste( "sqrt","(","(",round(new_point,2),"-",
                               round(feature_BMI[2],2) ,")","^2",")"),
-                 x="Overweight",y=new_point  ),nudge_y = 2,nudge_x=0 )
+                 x="Overweight",y=new_point  ),nudge_y = 2,nudge_x=0,size=5 )
 
 
 #######################  PART_2
 
-# Horoso , now its time to check example with 1 feature, BMI , but with 
+# Horoso , now its time to check example with 1 feature, 
+# BMI , but with 
 # multiple records for each class
 set.seed(123)
 sample_3<-data.frame(  feature_BMI=c( runif(3,18.5,24.9),
                                       runif(3, 25.0,29.9)),
                        class=c( rep("Healthy weight",3),rep("Overweight",3) ) )
 
-
+new_point<-24.5
 # We inspect Visuals
 ggplot(data=sample_3,aes(y= feature_BMI ,x=class))+
   geom_point(col="red",cex=6)+
   geom_label(aes(label=round(feature_BMI,2)  ),nudge_y = 0.1,nudge_x=0.2 )+
   geom_point(col="red")+geom_point(aes(y=new_point),col="blue",cex=5) +
-  geom_label(aes(label=round(new_point,2),x=class,y=new_point  ),nudge_y = 0.1,nudge_x=0.2,color="blue" )
+  geom_label(aes(label=round(new_point,2),x=class,y=new_point  ),nudge_y = 0.1,nudge_x=0.2,color="blue" )+
+  theme(axis.text=element_text(size=15) )
 # Again , now we need to use 6 red poins  to decide 
 # to which class blue point belongs, therefore, here we estimate
 # 6 values for Euclidian distacne
@@ -155,7 +151,8 @@ ggplot2::ggplot(data=sample_3,aes(y= feature_BMI ,x=class))+
   geom_label(aes(label=paste("sqrt","(","(",round(new_point,2),"-",round(feature_BMI[1],2) ,")","^2",")","\n",
                              "sqrt","(","(",round(new_point,2),"-",round(feature_BMI[2],2) ,")","^2",")","\n",
                              "sqrt","(","(",round(new_point,2),"-",round(feature_BMI[3],2) ,")","^2",")"),
-                 x="Healthy weight",y=new_point  ),nudge_y = 2,nudge_x=0 )
+                 x="Healthy weight",y=new_point  ),nudge_y = 5,nudge_x=0,size=5 )+
+  theme(axis.text=element_text(size=15) )
 # same calculation are aplied to column Overweignt
 
 # Assume that k equals 3 , threrefore we need to choode
@@ -165,19 +162,21 @@ ggplot2::ggplot(data=sample_3,aes(y= feature_BMI ,x=class))+
 sample_3 <-sample_3 %>% dplyr::arrange(Eu_Dist) %>% dplyr::slice(1:3)
 
 table(sample_3$class) # now we use table to count uniqu classes
-prop.table( table(sample_3$class) ) # prop.table to wrup table is used to check share of class
-# among other classes, we divide count of overweight records by total
+prop.table( table(sample_3$class) ) # prop.table to wrup table is used 
+# to check share of class
+# among other classes, we divide count of Healthy weight records by total
 # number of records
 
-# How should the  process be implemented with R fucntion
+# here is the solution for knn fucntion
 class::knn( train=sample_3[,1],
             test=new_point,
             cl=sample_3[,2],k=3, 
             prob=TRUE )
-
-# probality shows share of most commom class, this is the output of
+# probality shows share of most commom class, this is identical
+# to the output of
 # prop.table , proportion table 
 
+# Greate Job let us proceed
 
 ############ PART 3
 
@@ -196,22 +195,7 @@ summary(sample_4[,-5])
 # we can not conclude that particula feature
 # is extremely far from other 
 
-cat(   "sqrt(  (1000-5.0)^2+(2.7-2.0)^2+(3.9-3.5)^2     )"      )
-# this is equation fo EU distance for single 
-# record with 3 features, first valun in brackest is x
-# We are conserned with feature range because 
-# EU distance is sensetive to outlies 
-# and , if lets say x1,1000, is significantluy greater
-# than other features, 
-#it would increase Eu distance for partcicual record
-# and would lower the changes of 
-# class, which correspond to the respecive record,
-# to become meaningfull classifier.
-# the resoective situations may require use or
-# data normalisteion ,but so far, Iris data set in our example
-# does not reuqire specia transofrmation
-
-# goind bacj to sample_4
+# goind back to sample_4
 tibble::glimpse(sample_4)
 # in this example there are 4 features which 
 # are characeristics of 3 different plants, 
@@ -230,7 +214,7 @@ sample_4$Species %>% unique()
 # we need 3 records, 1 per each class, therefore
 # our train set woudl contain 1 samples for each class
 
-# we would require to group data and take 1 sample from each froup
+# we would require to group data and take 1 sample from each group
 train_row_3<-sample_4[-loc,] %>% dplyr::group_by(Species) %>%
   slice(1)
 
@@ -251,8 +235,8 @@ test_row_1
 gg_train<-train_row_3 %>% tidyr::pivot_longer(Sepal.Length:Petal.Width ,
                                               names_to="Feature") %>%
   rename("Class"="Species")  
-# here we Gather columns data from multiple column into rows
-#for train data
+# here we transform train set from wide format, with 5 columns
+# to long format with 3 column
 
 gg_test<-test_row_1 %>% tidyr::pivot_longer(Sepal.Length:Petal.Width ,
                                             names_to="Feature") %>%
@@ -260,18 +244,18 @@ gg_test<-test_row_1 %>% tidyr::pivot_longer(Sepal.Length:Petal.Width ,
 
 gg_in<-dplyr::bind_rows(gg_train,gg_test)
 
-## here my goal to create long table  where each column is
+## here our  goal to create long table  where each column is
 # separate variale, this is only done to use fucntionality of ggplot2
 
 ggplot2::ggplot(data=gg_in,aes(y=Class,x=value))+ 
   geom_point(aes(col= Class),cex=5)+
   geom_text(aes(label=round(value,2),color=Class ),cex=4,nudge_y = 0.2 ) + 
   facet_grid(~Feature,  space="free") +
-  theme_bw()
+  theme_bw(base_size = 15)
 
 #  Unknown  Class  is present per each feature,
 #  other  dots are features from 3 instances  
-#  of train set with defined class
+#  of trainini set with defined class
 
 # 3 train records and 1 test record means 3 equations, 4 features per record,
 # mean 4 operand in equation
@@ -312,7 +296,7 @@ loc<-sample(1:nrow(iris),nrow(iris)*0.2 ) # this are indices for test set
 test_set<-iris[ loc   , -5 ]
 test_set_cl<-iris[ loc   , 5 ]
 train_set<-iris[ -loc   , ] # use use minus
-          #to select rows which are not part of test set
+#to select rows which are not part of test set
 
 
 # How would knn fucntion perform
@@ -326,7 +310,8 @@ m1_knn<-knn( train=train_set[,-5],
 sum(m1_knn==test_set_cl)/ length(test_set_cl)
 
 
-##  now lest write our own solution to soliduty understandng 
+##  now lest write our own solution
+# to soliduty understandng 
 ## of knn 
 n_test<-nrow(test_set)
 n_train<-nrow(train_set)
