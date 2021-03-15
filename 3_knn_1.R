@@ -15,14 +15,14 @@ library(class)  # model building
 
 #  To initiate knn the follwong action shoul be taken:
 #  Data inspection 
-#  Splitting data into training and testing datasets
+#  Splitting data into training and test datasets
 #  Fitting the model to training data
 #  Evaluate perfomance on test data
 #  Model tuning , specifically, for knn, to determine optimal values of k
 
 
 # Goal of Knn is to 
-# Estimate similarity between records with defined classes with 
+# Estimate similarity between records with ,defined classes, with 
 # records without defined class
 
 #  Now, how to measure similary of records?
@@ -36,7 +36,7 @@ sample_1<-data.frame(  feature_BMI=c( runif(1,18.5,24.9),
                        class=c( "Healthy weight","Overweight" ),
                        row.names=c("inst_1  ","inst_2  ")   )
 
-#  code sampel is available at github ,fill free to replicate it
+#  code sampel is available at github ,fill free to replicate it.
 # we can use View to explicitly check all records
 View(sample_1)
 
@@ -360,7 +360,7 @@ for (i in (1:10) )  {
 # used to solve  classification  challenhes.
 
 # It works especially well  when features form 
-#  homogenous numerical data , the point  of convern is to 
+#  homogenous numerical data , the point  of concern is to 
 # choose oprimal K values to achieve higest accuracy
 
 
