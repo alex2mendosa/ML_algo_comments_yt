@@ -22,7 +22,7 @@ library(class)  # model building
 
 
 # Goal of Knn is to 
-# Estimate similarity between records with ,defined classes, with 
+# Estimate similarity between records with defined classes and 
 # records without defined class
 
 #  Now, how to measure similary of records?
@@ -73,7 +73,7 @@ ggplot2::ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
 # green and blue point
 
 # Lets estimate Euclidian Distance between 2 poins
-
+# if only 2 values are present in formula, we simply estimate absolute value of diference
 dist_1<- sqrt( (new_point-sample_1$feature_BMI[1])^2 )
 dist_2<- sqrt( (new_point-sample_1$feature_BMI[2])^2 )
 
@@ -94,7 +94,7 @@ sample_1$class[3]<-sample_1$class[ which.min(sample_1$Eu_Dist) ]
 
 # how to implement the process with buid in r fucntion
 # we would call for knn fucntion from class package
-class::knn( train=sample_1[c(1,2),1], # we define training set, and esclude column with classes 
+class::knn( train=sample_1[c(1,2),1], # we define only training set, and exclude column with classes 
             test=new_point, # define value we need to classify
             cl=sample_1[c(1,2),2], # indicate classes which coreslond to known record
             k=1 ) # how many neighbours to consider
@@ -128,7 +128,7 @@ sample_3<-data.frame(  feature_BMI=c( runif(3,18.5,24.9),
                        class=c( rep("Healthy weight",3),rep("Overweight",3) ) )
 
 new_point<-24.5
-# We inspect Visuals
+# We use Visuals
 ggplot(data=sample_3,aes(y= feature_BMI ,x=class))+
   geom_point(col="red",cex=6)+
   geom_label(aes(label=round(feature_BMI,2)  ),nudge_y = 0.1,nudge_x=0.2 )+
@@ -170,9 +170,10 @@ prop.table( table(sample_3$class) ) # prop.table to wrup table is used
 # here is the solution for knn fucntion
 class::knn( train=sample_3[,1],
             test=new_point,
-            cl=sample_3[,2],k=3, 
+            cl=sample_3[,2],
+            k=3, 
             prob=TRUE )
-# probality shows share of most commom class, this is identical
+# probality shows share of class, this is identical
 # to the output of
 # prop.table , proportion table 
 
@@ -180,7 +181,7 @@ class::knn( train=sample_3[,1],
 
 ############ PART 3
 
-# Knn is great classifying tool for data with homogenous 
+# Knn is great classification tool for data with homogenous 
 # records, for example in iris dataset all features are
 #of numeric type
 sample_4<-iris
@@ -200,23 +201,25 @@ tibble::glimpse(sample_4)
 # in this example there are 4 features which 
 # are characeristics of 3 different plants, 
 # out target is to find class[Species] of 
-# plant fiven its 4 featues
+# plant given its 4 featues
 
 
 # lets sample single row we would like to predict
 set.seed(321)
 loc<-sample(1:nrow(sample_4),1 ) # we randomly generate index
 test_row_1<-sample_4[ loc[1]   , -5  ] # here we store 1 record we need to classify
-test_row_cl<-sample_4[ loc[1]   , 5  ] # here we store actual classes for test row
+test_row_cl<-sample_4[ loc[1]   , 5  ] # here we store actual classes for test record
 
 # what classes are available 
 sample_4$Species %>% unique()
-# we need 3 records, 1 per each class, therefore
-# our train set woudl contain 1 samples for each class
+# we have 3 unique classes, for this particular example
+# our traininig set should contain 1 record for each class
 
 # we would require to group data and take 1 sample from each group
 train_row_3<-sample_4[-loc,] %>% dplyr::group_by(Species) %>%
   slice(1)
+# here I extract first record from each group
+
 
 # First off all wee ned to draw 4 graphs, 
 # 1 graph per feature where each graph contains
@@ -259,22 +262,22 @@ ggplot2::ggplot(data=gg_in,aes(y=Class,x=value))+
 
 # 3 train records and 1 test record means 3 equations, 4 features per record,
 # mean 4 operand in equation
-# here is Eu for single row
+# here is example of Eu for single row
 
-cat( "sqrt(  (4.8-6)^2+(1.4-2.5)^2+(6.8-6.3)^2+(2.8-3.3)^2    )"      )
+cat( "sqrt(  (4.8-6)^2+(1.4-2.5)^2+(6.8-6.3)^2+(2.8-3.3)^2    )"    )
 
 #  Here we need to substract train set form test
 train_row_3[,-5]-test_row_1 # both have different rows , we need to triple
 # first  record in test set
-train_row_3[,-5]-test_row_1[ c(1,1,1),]   # here first rows is repeated 3 times
+train_row_3[,-5]-test_row_1[ c(1,1,1),]   # here first row is repeated 3 times
 # this is how to extract values element wise when dealing with 
-# data frames
+# data frames of different rows numbers
 
 # the whole eaution with rowSums
 Euc_Dist=rowSums( (train_row_3[,-5]-test_row_1[ c(1,1,1), ])^2 ) %>% sqrt()
 
 # now we would create additional column and arrange data, then pull 1 nearest
-# neighbours because number of classes equals number of records
+# neighbours , only 1 neigh because number of classes equals number of records
 train_row_3 %>% ungroup() %>% mutate(Euc_Dist=Euc_Dist) %>%
   arrange(Euc_Dist) %>% slice(1)
 test_row_cl
