@@ -13,7 +13,7 @@ library(class)  # model building
 # supervised means that all rows or instances  
 # are labeled with specific class or outcome
 
-#  To initiate knn the follwong action shoul be taken:
+#  To initiate knn the followong action should be taken:
 #  Data inspection 
 #  Splitting data into training and test datasets
 #  Fitting the model to training data
@@ -36,8 +36,8 @@ sample_1<-data.frame(  feature_BMI=c( runif(1,18.5,24.9),
                        class=c( "Healthy weight","Overweight" ),
                        row.names=c("inst_1  ","inst_2  ")   )
 
-#  code sampel is available at github ,fill free to replicate it.
-# we can use View to explicitly check all records
+#  code sample is available at github ,fill free to replicate it.
+# we can use View function to explicitly check all records
 View(sample_1)
 
 # Greate job 
@@ -54,7 +54,7 @@ ggplot2::ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
 # Forst or second class: Healhy or overweight
 
 set.seed(123)
-new_point<-runif(1,18.5,29.9) # generate random point
+new_point<-runif(1,18.5,29.9) %>% round(2) # generate random point
 
 # lets take advantage of ggplot2 again
 ggplot2::ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
@@ -73,9 +73,16 @@ ggplot2::ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
 # green and blue point
 
 # Lets estimate Euclidian Distance between 2 poins
-# if only 2 values are present in formula, we simply estimate absolute value of diference
+# if only 2 values are present in formula, 
+# we simply estimate absolute value of diference
 dist_1<- sqrt( (new_point-sample_1$feature_BMI[1])^2 )
 dist_2<- sqrt( (new_point-sample_1$feature_BMI[2])^2 )
+
+# absolute value of difference
+abs( new_point-sample_1$feature_BMI[1] )
+abs( new_point-sample_1$feature_BMI[2] )
+# we get similar values because our aritmmetic 
+# operation has only 2 values per equation
 
 #lets add new column to sample_1
 sample_1<-sample_1 %>% dplyr::mutate(Eu_Dist=sqrt( (new_point-feature_BMI)^2 ))
@@ -87,7 +94,7 @@ row.names(sample_1)[3]<-3
 
 # Value for "Healthy weight"??? is smaller, it is closer, therefore
 # blue dot should belong to Healthy weight class
-
+# lets modify our dataset again
 sample_1$class[3]<-sample_1$class[ which.min(sample_1$Eu_Dist) ] 
 # use which.min, # ignores NA
 
@@ -96,7 +103,7 @@ sample_1$class[3]<-sample_1$class[ which.min(sample_1$Eu_Dist) ]
 # we would call for knn fucntion from class package
 class::knn( train=sample_1[c(1,2),1], # we define only training set, and exclude column with classes 
             test=new_point, # define value we need to classify
-            cl=sample_1[c(1,2),2], # indicate classes which coreslond to known record
+            cl=sample_1[c(1,2),2], # indicate classes which coreslond to known record in training set
             k=1 ) # how many neighbours to consider
 
 # to sum up , lets proceed to ggplot 2
@@ -162,10 +169,12 @@ ggplot2::ggplot(data=sample_3,aes(y= feature_BMI ,x=class))+
 sample_3 <-sample_3 %>% dplyr::arrange(Eu_Dist) %>% dplyr::slice(1:3)
 
 table(sample_3$class) # now we use table to count uniqu classes
-prop.table( table(sample_3$class) ) # prop.table to wrup table is used 
+prop.table( table(sample_3$class) ) # prop.table is used 
 # to check share of class
 # among other classes, we divide count of Healthy weight records by total
 # number of records
+
+# this is our vote data, we shoudl select the most probable class
 
 # here is the solution for knn fucntion
 class::knn( train=sample_3[,1],
@@ -173,9 +182,11 @@ class::knn( train=sample_3[,1],
             cl=sample_3[,2],
             k=3, 
             prob=TRUE )
-# probality shows share of class, this is identical
+# i added parameter prob
+# prop shows probality or share of test class, 
+# this is identical
 # to the output of
-# prop.table , proportion table 
+# prop.table function
 
 # Greate Job let us proceed
 
@@ -213,12 +224,15 @@ test_row_cl<-sample_4[ loc[1]   , 5  ] # here we store actual classes for test r
 # what classes are available 
 sample_4$Species %>% unique()
 # we have 3 unique classes, for this particular example
-# our traininig set should contain 1 record for each class
+# we want to make sure that
+# our traininig set would contain at least 
+# 1 record for each class
 
 # we would require to group data and take 1 sample from each group
 train_row_3<-sample_4[-loc,] %>% dplyr::group_by(Species) %>%
   slice(1)
-# here I extract first record from each group
+# here I extract first record from each group, therefore
+# i have 1 representative for each class in my training set
 
 
 # First off all wee ned to draw 4 graphs, 
@@ -239,7 +253,7 @@ gg_train<-train_row_3 %>% tidyr::pivot_longer(Sepal.Length:Petal.Width ,
                                               names_to="Feature") %>%
   rename("Class"="Species")  
 # here we transform train set from wide format, with 5 columns
-# to long format with 3 column
+# to long format with 3 column, data is the same
 
 gg_test<-test_row_1 %>% tidyr::pivot_longer(Sepal.Length:Petal.Width ,
                                             names_to="Feature") %>%
@@ -247,7 +261,7 @@ gg_test<-test_row_1 %>% tidyr::pivot_longer(Sepal.Length:Petal.Width ,
 
 gg_in<-dplyr::bind_rows(gg_train,gg_test)
 
-## here our  goal to create long table  where each column is
+## here our  goal is to create long table  where each column is
 # separate variale, this is only done to use fucntionality of ggplot2
 
 ggplot2::ggplot(data=gg_in,aes(y=Class,x=value))+ 
@@ -262,7 +276,7 @@ ggplot2::ggplot(data=gg_in,aes(y=Class,x=value))+
 
 # 3 train records and 1 test record means 3 equations, 4 features per record,
 # mean 4 operand in equation
-# here is example of Eu for single row
+# here is example of Eu for random data
 
 cat( "sqrt(  (4.8-6)^2+(1.4-2.5)^2+(6.8-6.3)^2+(2.8-3.3)^2    )"    )
 
@@ -301,7 +315,6 @@ test_set_cl<-iris[ loc   , 5 ]
 train_set<-iris[ -loc   , ] # use use minus
 #to select rows which are not part of test set
 
-
 # How would knn fucntion perform
 m1_knn<-knn( train=train_set[,-5],
              test=test_set,
@@ -325,8 +338,8 @@ out<-rep("",n_test) # out vecotr would store our result of classification
 # what we want to do
 
 i<-1
-for ( i in 1:n_test) {
-  # lets check each operand
+for ( i in 1:n_test) { # we go through each record of test set
+    # estimate Eu Distance between single row of test set and all rows of train set
   Eu_Dist=rowSums( (train_set[,-5] - test_set[i,][c(rep(1,n_train)), ] ) ^2 ) %>% sqrt()
   train_buf<-train_set %>% mutate(Eu_Dist=Eu_Dist) %>% arrange(Eu_Dist) %>%
     slice(1:3)
@@ -339,14 +352,14 @@ sum(out==test_set_cl)/ n_test
 
 # WE ESTIMATE EUCLIDIAN DISTANCE, WE adjust size of test set to size of
 # training set, we use which.max and table to find most 
-# common  clan wihtoin 3 rows
+# common  clan within 3 rows
 
 ## finaly , lets combine knn fucntion and loop to 
 ## chack if our accuracy can be improved
 
-
 # Again, lets proceed with loop
-# we woudl ckech accuraccy for k range form 1 to 10
+# we woudl ckech how accuraccy depends on 
+#  k values  ranging form 1 to 10
 for (i in (1:10) )  {
   m1_knn<-knn( train=train_set[,-5],
                test=test_set,
