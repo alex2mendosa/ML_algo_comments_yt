@@ -8,7 +8,6 @@ library(class)   # model building
 
 
 
-
 #######################  PART_1
 
 # data frame with 2 records
@@ -16,8 +15,10 @@ sample_1<-data.frame(  feature_BMI=c( runif(1,18.5,24.9),
                                       runif(1, 25.0,29.9)),
                        class=c( "Healthy weight","Overweight" ),
                        row.names=c("inst_1  ","inst_2  ")   )
+# inspect data set
 View(sample_1)
 
+# visualise dataset
 ggplot2::ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
   geom_point(col="red",cex=10)+
   geom_label(aes(label=round(feature_BMI,2)  ),nudge_y = 0.5 )+
@@ -27,6 +28,7 @@ ggplot2::ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
 set.seed(123)
 new_point<-runif(1,18.5,29.9) %>% round(2)
 
+# visualise both classified and unclassified records
 ggplot2::ggplot(data=sample_1,aes(y= feature_BMI ,x=class))+
   geom_point(aes(col=class),cex=10)+
   geom_label(aes(label=round(feature_BMI,2)  ),nudge_y = 0.1,nudge_x=0.2 )+
@@ -50,6 +52,7 @@ abs( new_point-sample_1$feature_BMI[2] )
 sample_1<-sample_1 %>% 
          dplyr::mutate(Eu_Dist=sqrt( (new_point-feature_BMI)^2 ))
 
+# Add row with unknown class
 sample_1<-sample_1 %>%
   dplyr::bind_rows( tibble(feature_BMI=new_point,class=NA,Eu_Dist=NA) )
 row.names(sample_1)[3]<-3
@@ -57,7 +60,7 @@ row.names(sample_1)[3]<-3
 # Find index of smallest Euclidean distance
 sample_1$class[3]<-sample_1$class[ which.min(sample_1$Eu_Dist) ] 
 
-
+# use knn function to classify row
 class::knn( train=sample_1[c(1,2),1], # define features of training set 
             test=new_point, # define value we need to classify
             cl=sample_1[c(1,2),2], # define classes of training set
@@ -116,7 +119,7 @@ ggplot2::ggplot(data=sample_3,aes(y= feature_BMI ,x=class))+
 sample_3 <-sample_3 %>% dplyr::arrange(Eu_Dist) %>% dplyr::slice(1:3)
 
 table(sample_3$class) # distribution of each unique value 
-prop.table( table(sample_3$class) ) 
+prop.table( table(sample_3$class) ) # probability of each unique value
 
 
 # Solution with knn function
@@ -154,7 +157,6 @@ sample_4$Species %>% unique()
 train_row_3<-sample_4[-loc,] %>% dplyr::group_by(Species) %>%
   slice(1)
 
-
 train_row_3
 test_row_1
 
@@ -178,22 +180,28 @@ ggplot2::ggplot(data=gg_in,aes(y=Class,x=value))+
   facet_grid(~Feature,  space="free") +
   theme_bw(base_size = 15)
 
+
+
+
 cat( "sqrt(  (4.8-6)^2+(1.4-2.5)^2+(6.8-6.3)^2+(2.8-3.3)^2    )"    )
 
-#  substract train set form test
+#  substract train set form test set
 train_row_3[,-5]-test_row_1 # both have different rows
 
 #  repeat first record of test set to match size of train set
 train_row_3[,-5]-test_row_1[ c(1,1,1),]   #  first row is repeated 3 times
 # this is how to extract values element wise when dealing with 
+# data frames of different size
 
-# equation with rowSums
+# equation with rowSums() and sqrt() to estimate Euclidean distance
 Euc_Dist=rowSums( (train_row_3[,-5]-test_row_1[ c(1,1,1), ])^2 ) %>% sqrt()
 
+# select closest instance 
 train_row_3 %>% ungroup() %>% mutate(Euc_Dist=Euc_Dist) %>%
   arrange(Euc_Dist) %>% slice(1)
 test_row_cl
 
+# check result with knn function
 class::knn( train=train_row_3[,-5],
             test=test_row_1,
             cl=dplyr::pull(train_row_3[,5]), # here I use pull because cl accepts vector as input
@@ -212,13 +220,14 @@ train_set<-iris[ -loc   , ] # train set
 
 
 # How knn fucntion performs
-m1_knn<-knn( train=train_set[,-5],
-             test=test_set,
-             cl=train_set[,5], k=3,
+m1_knn<-knn( train=train_set[,-5], # features of train set
+             test=test_set,  # record to classify
+             cl=train_set[,5],  # class of train set
+             k=3, 
              prob=TRUE)
 
 # Estimate accuracy, how many values in 
-# m1_knn equal to values in test set classes
+# m1_knn equal to values of test set classes
 sum(m1_knn==test_set_cl)/ length(test_set_cl)
 
 
@@ -235,7 +244,7 @@ for ( i in 1:n_test) { # we go through each record of test set
   # we select 3 closest records
   train_buf<-train_set %>% mutate(Eu_Dist=Eu_Dist) %>% arrange(Eu_Dist) %>%
     slice(1:3)
-  # class with the larger count
+  # class with the larger count is stored in out vector
   class_buf<-names( which.max(table(train_buf$Species)))
   out[i]<-class_buf
 } 
